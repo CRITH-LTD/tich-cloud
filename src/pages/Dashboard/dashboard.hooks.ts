@@ -18,7 +18,7 @@ import {
     updateUserInRole as handleUpdateUserInRole,
     removeUserFromRole as handleRemoveUserFromRole,
 } from '../../features/UMS/UMSCreationSlice'; // Adjust the path to your slice file
-import { Role, RoleUser, UMS, UMSForm } from "../../interfaces/types";
+import { PermissionsData, Role, RoleUser, UMS, UMSForm } from "../../interfaces/types";
 import api from "../../config/axios";
 import { toast } from "react-toastify";
 import {
@@ -62,17 +62,17 @@ export const useUMSManagement = () => {
     const resetError = () => dispatch(clearError());
 
     const handleAction = (action: 'view' | 'delete', umsId: string) => {
-            const ums = umsList.find((u) => u.id === umsId);
-            if (!ums) return;
-            if (action === 'view') {
-                navigate(`/dashboard/ums/${umsId}`);
-                setCurrentUMS(ums);
-            }
-            if (action === 'delete') {
-                const confirmed = window.confirm(`Are you sure you want to terminate "${ums.umsName}"?`);
-                if (confirmed) deleteUMS(umsId);
-            }
-        };
+        const ums = umsList.find((u) => u.id === umsId);
+        if (!ums) return;
+        if (action === 'view') {
+            navigate(`/dashboard/ums/${umsId}`);
+            setCurrentUMS(ums);
+        }
+        if (action === 'delete') {
+            const confirmed = window.confirm(`Are you sure you want to terminate "${ums.umsName}"?`);
+            if (confirmed) deleteUMS(umsId);
+        }
+    };
     return {
         umsList,
         currentUMS,
@@ -88,10 +88,82 @@ export const useUMSManagement = () => {
     };
 };
 
+
+export const usePermissions = () => {
+    const [permissions, setPermissions] = useState<PermissionsData | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const getPermissions = async () => {
+        try {
+            setLoading(true);
+            const response = await api.get('/permissions/grouped');
+
+            // Assuming the response.data matches the PermissionsData structure
+            setPermissions(response.data || null);
+            console.log('Permissions loaded:', response.data);
+            setError(null);
+        } catch (err: unknown) {
+            console.error('Error fetching permissions:', err);
+
+            // Type-safe error handling
+            if (
+                err &&
+                typeof err === 'object' &&
+                'response' in err &&
+                err.response &&
+                typeof err.response === 'object' &&
+                'data' in err.response &&
+                err.response.data &&
+                typeof err.response.data === 'object' &&
+                'message' in err.response.data
+            ) {
+                setError((err.response.data as { message?: string }).message || 'Failed to load permissions');
+            } else {
+                setError('Failed to load permissions');
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        getPermissions();
+    }, []);
+
+    // Helper functions to work with permissions
+    const hasPermission = (module: keyof PermissionsData, permissionName: string): boolean => {
+        if (!permissions) return false;
+        return permissions[module].some(permission => permission.name === permissionName);
+    };
+
+    const getPermissionsByModule = (module: keyof PermissionsData) => {
+        return permissions?.[module] || [];
+    };
+
+    const getAllPermissions = () => {
+        if (!permissions) return [];
+
+        return Object.values(permissions).flat();
+    };
+
+    return {
+        permissions,
+        loading,
+        error,
+        refetch: getPermissions,
+        hasPermission,
+        getPermissionsByModule,
+        getAllPermissions
+    };
+};
+
+
 export const useCreateUMS = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { currentStep, formData } = useSelector((state: RootState) => state.umsCreation);
+
 
     // Generic field updater
     const updateField = <K extends keyof UMSForm>(field: K, value: UMSForm[K]) => {
@@ -141,6 +213,11 @@ export const useCreateUMS = () => {
 
     // Submit the UMS
     const submitUMS = async (form: UMSForm) => {
+
+        if(!form.umsName || !form.adminName || !form.adminEmail) {
+            toast.error("Please fill in all required fields");
+            return;
+        }
         try {
             const formData = new FormData();
 

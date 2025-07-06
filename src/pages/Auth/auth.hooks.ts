@@ -83,10 +83,10 @@ export const useAuthForm = ({ intent }: UseAuthFormProps) => {
             const {
                 confirmPassword,
                 agreeToTerms,
-                subscribeToUpdates,
+                // subscribeToUpdates,
                 ...rest
             } = formData;
-            console.log("There are " + confirmPassword?.length + " Good Ideas Today");
+            console.log("There are " + confirmPassword?.length + " Good Ideas Today and they are " + agreeToTerms );
             payload = { ...rest }; // remove confirmPassword, agreeToTerms, subscribeToUpdates
         }
 

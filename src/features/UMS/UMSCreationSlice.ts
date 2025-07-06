@@ -81,6 +81,7 @@ const umsCreationSlice = createSlice({
             const newRole = {
                 name: action.payload.name || "",
                 description: action.payload.description || "",
+                permissions: action.payload.permissions || [],
                 users: action.payload.users || []
             };
             state.formData.roles.push(newRole);

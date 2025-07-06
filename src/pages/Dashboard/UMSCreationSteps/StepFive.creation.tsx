@@ -161,6 +161,21 @@ const StepFive = () => {
                                                 {/* Role Users with Password */}
                                                 {role.users.length > 0 && (
                                                     <div className="mt-3 pt-3 border-t border-gray-100">
+                                                        <h6 className="text-xs font-medium text-gray-500 mb-2">Permissions associated with this role:</h6>
+                                                        <ul className="space-y-3 max-h-[20vh] overflow-auto">
+                                                            {role.permissions.map((perm) => (
+                                                                <li key={perm.id} className="text-sm">
+                                                                    <div className="flex items-center justify-between mb-1">
+                                                                        <span className="text-gray-800">
+                                                                            {perm.name.replace('_', (' ').toUpperCase())}
+                                                                        </span>
+                                                                        <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
+                                                                            {perm.description}
+                                                                        </span>
+                                                                    </div>
+                                                                </li>
+                                                            ))}
+                                                        </ul>
                                                         <h6 className="text-xs font-medium text-gray-500 mb-2">Users with this role:</h6>
                                                         <ul className="space-y-3">
                                                             {role.users.map((user, userIndex) => (

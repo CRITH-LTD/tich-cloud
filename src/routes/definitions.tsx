@@ -11,6 +11,7 @@ export const lazyPages = {
   CreateUMSFragment: lazy(() => import("../pages/Dashboard/CreateUMS.fragment")),
   UMSPage: lazy(() => import("../pages/Dashboard/UMSPage")),
   UMSDetailPage: lazy(() => import("../pages/Dashboard/UMSCreationSteps/UMSDetail/UMSDetailPage")),
+  UMSSettingsPage: lazy(() => import("../pages/Dashboard/UMSCreationSteps/UMSSettings/UMSSettingsPage")),
   
 } as const;
 

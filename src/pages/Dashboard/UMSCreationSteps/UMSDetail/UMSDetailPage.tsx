@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useUMSDetail } from "../../dashboard.hooks";
 import { Breadcrumbs } from "../../../../components/Common/Breadcrumbs";
-import { 
-    Globe, 
-    Users, 
-    Shield, 
-    Building, 
-    Mail, 
-    Phone, 
+import {
+    Globe,
+    Users,
+    Shield,
+    Building,
+    Mail,
+    Phone,
     CheckCircle,
     XCircle,
     Camera,
@@ -17,24 +17,17 @@ import {
     Smartphone,
     Monitor,
     Crown,
-    Key
+    Key,
+    School2Icon
 } from "lucide-react";
-import { ContactItem, InfoCard, PlatformItem, RoleCard, StatCard, StatusBadge, TypeBadge } from "./ComponentLib";
+import { ContactItem, DepartmentCard, InfoCard, PlatformItem, RoleCard, StatCard, StatusBadge, TypeBadge } from "./ComponentLib";
 
-/**
- * ✨ Enhanced UMS Detail Page
- * ---------------------------
- * - Logical information architecture with clear sections
- * - Visual hierarchy with proper spacing and typography
- * - Interactive elements with hover states
- * - Mobile-responsive design
- * - Accessible color schemes and contrast
- */
 
 const UMSDetailPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const { ums, isLoading, error, fetchUMS } = useUMSDetail();
     const [openRole, setOpenRole] = useState<number | null>(null);
+    const [openDept, setOpenDept] = useState<number | null>(null);
 
     useEffect(() => {
         if (id) fetchUMS(id);
@@ -77,10 +70,10 @@ const UMSDetailPage: React.FC = () => {
     return (
         <>
             <Breadcrumbs />
-            
+
             <div className="min-h-screen bg-gray-50">
                 {/* Header Section */}
-                <header className="bg-white border-b border-gray-200 shadow-sm">
+                <header className="bg-white rounded-lg border-b border-gray-200 shadow-sm">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="flex items-center justify-between py-6">
                             <div className="flex items-center space-x-6">
@@ -101,14 +94,18 @@ const UMSDetailPage: React.FC = () => {
                                     </p>
                                 </div>
                             </div>
-                            
+
                             <div className="flex items-center space-x-4">
-                                <StatusBadge 
-                                    status={ums.enable2FA ? "secure" : "basic"} 
+                                <StatusBadge
+                                    status={ums.enable2FA ? "secure" : "basic"}
                                     label={ums.enable2FA ? "2FA Enabled" : "Basic Auth"}
                                 />
                                 <TypeBadge type={ums.umsType!} />
                             </div>
+                            <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <Settings className="h-4 w-4 mr-2" />
+                                Settings
+                            </button>
                         </div>
                     </div>
                 </header>
@@ -118,7 +115,7 @@ const UMSDetailPage: React.FC = () => {
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         {/* Left Column - Main Info */}
                         <div className="lg:col-span-2 space-y-6">
-                            
+
                             {/* Overview Card */}
                             <InfoCard title="Overview" icon={Building}>
                                 <div className="prose prose-sm max-w-none">
@@ -130,19 +127,19 @@ const UMSDetailPage: React.FC = () => {
 
                             {/* Quick Stats */}
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <StatCard 
-                                    icon={Users} 
-                                    label="Size" 
-                                    value={ums.umsSize || "Not specified"} 
+                                <StatCard
+                                    icon={Users}
+                                    label="Size"
+                                    value={ums.umsSize || "Not specified"}
                                 />
-                                <StatCard 
-                                    icon={Database} 
-                                    label="Type" 
-                                    value={ums.umsType || "Standard"} 
+                                <StatCard
+                                    icon={Database}
+                                    label="Type"
+                                    value={ums.umsType || "Standard"}
                                 />
-                                <StatCard 
-                                    icon={Globe} 
-                                    label="Website" 
+                                <StatCard
+                                    icon={Globe}
+                                    label="Website"
                                     value={ums.umsWebsite || "Not provided"}
                                     isLink={!!ums.umsWebsite}
                                 />
@@ -168,25 +165,25 @@ const UMSDetailPage: React.FC = () => {
                                 <InfoCard title="Supported Platforms" icon={Monitor}>
                                     <div className="space-y-3">
                                         {ums.platforms?.teacherApp && (
-                                            <PlatformItem 
-                                                icon={Smartphone} 
-                                                label="Teacher Mobile App" 
-                                                status="active" 
+                                            <PlatformItem
+                                                icon={Smartphone}
+                                                label="Teacher Mobile App"
+                                                status="active"
                                             />
                                         )}
                                         {ums.platforms?.studentApp && (
-                                            <PlatformItem 
-                                                icon={Smartphone} 
-                                                label="Student Mobile App" 
-                                                status="active" 
+                                            <PlatformItem
+                                                icon={Smartphone}
+                                                label="Student Mobile App"
+                                                status="active"
                                             />
                                         )}
                                         {ums.platforms?.desktopOffices?.map((office) => (
-                                            <PlatformItem 
+                                            <PlatformItem
                                                 key={office}
-                                                icon={Monitor} 
-                                                label={office} 
-                                                status="active" 
+                                                icon={Monitor}
+                                                label={office}
+                                                status="active"
                                             />
                                         ))}
                                     </div>
@@ -213,7 +210,7 @@ const UMSDetailPage: React.FC = () => {
 
                         {/* Right Column - Admin & Roles */}
                         <div className="space-y-6">
-                            
+
                             {/* Admin Info */}
                             <InfoCard title="System Administrator" icon={Crown}>
                                 <div className="space-y-4">
@@ -228,21 +225,21 @@ const UMSDetailPage: React.FC = () => {
                                             <p className="text-sm text-gray-500">Root Access</p>
                                         </div>
                                     </div>
-                                    
+
                                     <div className="space-y-3 pt-4 border-t border-gray-200">
-                                        <ContactItem 
-                                            icon={Mail} 
-                                            label="Email" 
-                                            value={ums.adminEmail} 
+                                        <ContactItem
+                                            icon={Mail}
+                                            label="Email"
+                                            value={ums.adminEmail}
                                         />
-                                        <ContactItem 
-                                            icon={Phone} 
-                                            label="Phone" 
-                                            value={ums.adminPhone} 
+                                        <ContactItem
+                                            icon={Phone}
+                                            label="Phone"
+                                            value={ums.adminPhone}
                                         />
-                                        <ContactItem 
-                                            icon={Shield} 
-                                            label="2FA Status" 
+                                        <ContactItem
+                                            icon={Shield}
+                                            label="2FA Status"
                                             value={ums.enable2FA ? "Enabled" : "Disabled"}
                                             status={ums.enable2FA ? "success" : "warning"}
                                         />
@@ -264,6 +261,23 @@ const UMSDetailPage: React.FC = () => {
                                         ))
                                     ) : (
                                         <p className="text-gray-500 text-sm">No roles configured</p>
+                                    )}
+                                </div>
+                            </InfoCard>
+                            {/* Departments */}
+                            <InfoCard title="Departments" icon={School2Icon}>
+                                <div className="space-y-3">
+                                    {ums.departments?.length ? (
+                                        ums.departments.map((dept, idx) => (
+                                            <DepartmentCard
+                                                key={dept.name}
+                                                department={dept}
+                                                isOpen={openDept === idx}
+                                                onToggle={() => setOpenDept(openDept === idx ? null : idx)}
+                                            />
+                                        ))
+                                    ) : (
+                                        <p className="text-gray-500 text-sm">No Departments created yet.</p>
                                     )}
                                 </div>
                             </InfoCard>

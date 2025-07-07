@@ -42,7 +42,7 @@ const AuthBootstrap = () => {
 
 function App() {
   return (
-    <div className="min-h-screen bg-[#E3D0D8] text-gray-900 font-sans antialiased">
+    <div className="min-h-screen bg-[#d0d0e3] text-gray-900 font-sans antialiased">
       <Provider store={store}>
         <AuthBootstrap />
         <RouterProvider router={router} />

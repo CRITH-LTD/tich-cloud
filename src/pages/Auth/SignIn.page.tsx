@@ -164,7 +164,8 @@ const SignIn = () => {
 
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 font-medium"
+              disabled={!formData.email || !formData.password}
+              className={`w-full ${!formData.email || !formData.password ? "bg-blue-200 hover:bg-blue-100" : "bg-blue-600 hover:bg-blue-700"} text-white py-3 px-4 rounded-lg  focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 font-medium`}
             >
               Sign in to Console
             </button>

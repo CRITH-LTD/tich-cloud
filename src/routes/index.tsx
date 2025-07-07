@@ -40,6 +40,10 @@ export const routes: RouteObject[] = [
       {
         path: pathnames.UMS_DETAIL_PAGE,
         element: pages.UMSDetailPage,
+      },
+       {
+        path: pathnames.UMS_SETTINGS_PAGE,
+        element: pages.UMSSettingsPage,
       }
     ],
   },

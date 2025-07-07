@@ -1,12 +1,14 @@
 
-import { UMSForm } from "../../../../interfaces/types";
-import { 
-    ChevronDown, 
-    ChevronUp, 
-    Users, 
-    Shield, 
-    Building, 
-    Key
+import { department, UMSForm } from "../../../../interfaces/types";
+import {
+    ChevronDown,
+    ChevronUp,
+    Users,
+    Shield,
+    Building,
+    Key,
+    Calendar,
+    Building2
 } from "lucide-react";
 
 /* ─────────────────────── Component Library ─────────────────────── */
@@ -45,7 +47,7 @@ export const StatCard: React.FC<StatCardProps> = ({ icon: Icon, label, value, is
             <div className="flex-1 min-w-0">
                 <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{label}</p>
                 {isLink && value !== "Not provided" ? (
-                    <a 
+                    <a
                         href={value.startsWith('http') ? value : `https://${value}`}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -69,8 +71,8 @@ interface StatusBadgeProps {
 export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, label }) => (
     <span className={`
         inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
-        ${status === "secure" 
-            ? "bg-green-100 text-green-800" 
+        ${status === "secure"
+            ? "bg-green-100 text-green-800"
             : "bg-yellow-100 text-yellow-800"
         }
     `}>
@@ -108,8 +110,8 @@ export const PlatformItem: React.FC<PlatformItemProps> = ({ icon: Icon, label, s
         </div>
         <span className={`
             inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
-            ${status === "active" 
-                ? "bg-green-100 text-green-800" 
+            ${status === "active"
+                ? "bg-green-100 text-green-800"
                 : "bg-gray-100 text-gray-800"
             }
         `}>
@@ -132,9 +134,9 @@ export const ContactItem: React.FC<ContactItemProps> = ({ icon: Icon, label, val
             <p className="text-xs font-medium text-gray-500">{label}</p>
             <p className={`
                 text-sm font-medium truncate
-                ${status === "success" ? "text-green-600" : 
-                  status === "warning" ? "text-yellow-600" : 
-                  "text-gray-900"}
+                ${status === "success" ? "text-green-600" :
+                    status === "warning" ? "text-yellow-600" :
+                        "text-gray-900"}
             `}>
                 {value || "Not provided"}
             </p>
@@ -167,13 +169,13 @@ export const RoleCard: React.FC<RoleCardProps> = ({ role, isOpen, onToggle }) =>
                 <ChevronDown className="h-4 w-4 text-gray-500" />
             )}
         </button>
-        
+
         {isOpen && (
             <div className="p-4 bg-white border-t border-gray-200">
                 {role.description && (
                     <p className="text-sm text-gray-600 mb-4">{role.description}</p>
                 )}
-                
+
                 {/* Permissions */}
                 <div className="mb-4">
                     <h5 className="text-xs font-semibold text-gray-500 uppercase mb-2">Permissions</h5>
@@ -213,3 +215,62 @@ export const RoleCard: React.FC<RoleCardProps> = ({ role, isOpen, onToggle }) =>
         )}
     </div>
 );
+
+interface DepartmentCardProps {
+    department: department;
+    isOpen: boolean;
+    onToggle: () => void;
+}
+export const DepartmentCard: React.FC<DepartmentCardProps> = ({ department, isOpen, onToggle }) => {
+    const formatDate = (dateString: string) => {
+        return new Date(dateString).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+    };
+
+    return (
+        <div className="border border-gray-200 rounded-lg overflow-hidden">
+            <button
+                onClick={onToggle}
+                className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors duration-150"
+            >
+                <div className="flex items-center space-x-3">
+                    <Building2 className="h-4 w-4 text-gray-500" />
+                    <span className="font-medium text-gray-900">{department.name}</span>
+                </div>
+                {isOpen ? (
+                    <ChevronUp className="h-4 w-4 text-gray-500" />
+                ) : (
+                    <ChevronDown className="h-4 w-4 text-gray-500" />
+                )}
+            </button>
+
+            {isOpen && (
+                <div className="p-4 bg-white border-t border-gray-200">
+                    {department.description && (
+                        <p className="text-sm text-gray-600 mb-4">{department.description}</p>
+                    )}
+
+                    {/* Department Details */}
+                    <div className="mb-4">
+                        <h5 className="text-xs font-semibold text-gray-500 uppercase mb-2">Department Details</h5>
+                        <div className="space-y-2">
+                            <div className="flex items-center text-xs text-gray-600">
+                                <Calendar className="h-3 w-3 mr-2" />
+                                <span>Created: {formatDate(department.createdAt!)}</span>
+                            </div>
+                            <div className="flex items-center text-xs text-gray-600">
+                                <Calendar className="h-3 w-3 mr-2" />
+                                <span>Updated: {formatDate(department.updatedAt!)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            )}
+        </div>
+    );
+};

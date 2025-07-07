@@ -31,7 +31,7 @@ export type UMSForm = {
     umsDescription: string;
     umsTagline?: string;
     umsWebsite?: string;
-    umsType?: "University" | "College" | "School";
+    umsType?: "University" | "College" | "School" | undefined;
     umsSize?: string;
 
     adminName: string;
@@ -50,12 +50,21 @@ export type UMSForm = {
     };
 };
 
+export interface department {
+  id: string;
+  name: string;
+  description?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface UMS {
   umsName: string;
   umsDescription: string;
   adminName: string;
   adminEmail: string;
   enable2FA: boolean;
+  departments?: department[];
   roles: Role[];
   modules: string[];
   platforms: {
@@ -66,7 +75,7 @@ export interface UMS {
   umsLogoUrl: string;
   umsTagline: string | null;
   umsWebsite: string | null;
-  umsType: "University" | "College" | "School" | null;
+  umsType: "University" | "College" | "School" | undefined;
   umsSize: string | null;
   adminPhone: string | null;
   umsPhotoUrl: string | null;

@@ -115,7 +115,9 @@ export const useAuthForm = ({ intent }: UseAuthFormProps) => {
                 toast.success("Authenticated successfully!", { autoClose: 2000 });
                 navigate(pathnames.DASHBOARD);
             } else {
+                console.log("Unexpected response:", res);
                 toast.error("Unexpected response. Please try again.", { autoClose: 3000 });
+                toast.error(res.toString(), { autoClose: 3000 });
             }
 
         } catch (error: unknown) {

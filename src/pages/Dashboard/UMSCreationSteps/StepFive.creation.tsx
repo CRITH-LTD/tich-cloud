@@ -193,6 +193,7 @@ const StepFive = () => {
 
                                                                     {user.password && (
                                                                         <div className="flex items-center gap-2 mt-1">
+                                                                            text
                                                                             <div className="relative flex-1">
                                                                                 <input
                                                                                     type="text"

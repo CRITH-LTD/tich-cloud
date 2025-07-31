@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useUMSDetail } from "../../dashboard.hooks";
 import { Breadcrumbs } from "../../../../components/Common/Breadcrumbs";
 import {
@@ -29,6 +29,7 @@ const UMSDetailPage: React.FC = () => {
     const [openRole, setOpenRole] = useState<number | null>(null);
     const [openDept, setOpenDept] = useState<number | null>(null);
 
+    const navigate = useNavigate();
     useEffect(() => {
         if (id) fetchUMS(id);
     }, [id]);
@@ -102,7 +103,11 @@ const UMSDetailPage: React.FC = () => {
                                 />
                                 <TypeBadge type={ums.umsType!} />
                             </div>
-                            <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <button
+                                onClick={() => {
+                                    navigate(`/dashboard/ums/${ums.id}/settings`);
+                                }}
+                                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <Settings className="h-4 w-4 mr-2" />
                                 Settings
                             </button>

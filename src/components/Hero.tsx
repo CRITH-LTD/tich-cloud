@@ -1,7 +1,10 @@
 import { ArrowRight, Play, GraduationCap } from 'lucide-react';
 import { Link } from 'react-router';
+import useDashboardLayout from '../pages/Dashboard/dashboard.hooks';
 
 const Hero = () => {
+  const { user } = useDashboardLayout();
+
   return (
     <section className="relative pt-20 pb-16 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-indigo-50"></div>
@@ -30,10 +33,10 @@ const Hero = () => {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <Link
-              to="/signup"
+              to={user ? "/dashboard" : "/signup"}
               className="group bg-blue-600 text-white px-8 py-4 rounded-xl hover:bg-blue-700 transition-all duration-200 transform hover:scale-105 font-semibold text-lg shadow-2xl hover:shadow-3xl flex items-center"
             >
-              Get Started Free
+              {user ? "Continue to Dashboard" : "Get Started Free"} 
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Link>
             

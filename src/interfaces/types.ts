@@ -2,9 +2,9 @@ import { AuthState } from '../features/auth/authSlice';
 import { UMSCreationState } from '../features/UMS/UMSCreationSlice';
 
 export type RoleUser = {
-    email: string;
-    password?: string;
-    isPrimary?: boolean;
+  email: string;
+  password?: string;
+  isPrimary?: boolean;
 };
 
 export interface RootState {
@@ -18,36 +18,37 @@ export type PermissionsRoles = {
   description: string;
 }
 export type Role = {
-    name: string;
-    description?: string;
-    permissions: PermissionsRoles[];
-    users: RoleUser[];
+  name: string;
+  description?: string;
+  permissions: PermissionsRoles[];
+  users: RoleUser[];
 };
 
 export type UMSForm = {
-    umsName: string;
-    umsLogo?: string;
-    umsPhoto?: string;
-    umsDescription: string;
-    umsTagline?: string;
-    umsWebsite?: string;
-    umsType?: "University" | "College" | "School" | undefined;
-    umsSize?: string;
+  umsName: string;
+  umsLogo?: string;
+  umsPhoto?: string;
+  umsDescription: string;
+  umsTagline?: string;
+  umsWebsite?: string;
+  umsType?: "University" | "College" | "School" | undefined;
+  umsSize?: string;
+  departments?: department[];
 
-    adminName: string;
-    adminEmail: string;
-    adminPhone?: string;
-    enable2FA?: boolean;
+  adminName: string;
+  adminEmail: string;
+  adminPhone?: string;
+  enable2FA: boolean;
 
-    roles: Role[];
+  roles: Role[];
 
-    modules: string[];
+  modules: string[];
 
-    platforms: {
-        teacherApp: boolean;
-        studentApp: boolean;
-        desktopOffices: string[];
-    };
+  platforms: {
+    teacherApp: boolean;
+    studentApp: boolean;
+    desktopOffices: string[];
+  };
 };
 
 export interface department {
@@ -178,7 +179,7 @@ export interface PermissionsByName {
 }
 
 // Utility type to get all permission names
-export type PermissionName = 
+export type PermissionName =
   | keyof UserPermissions
   | keyof UmsPermissions
   | keyof DepartmentPermissions

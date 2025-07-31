@@ -3,6 +3,15 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuthForm } from "../Auth/auth.hooks";
 import { useDispatch, useSelector } from 'react-redux';
 import {
+    Settings,
+    Shield,
+    Key,
+    AlertTriangle,
+    Crown,
+    Database,
+    School2Icon
+} from "lucide-react";
+import {
     nextStep,
     prevStep,
     goToStep,
@@ -30,7 +39,111 @@ import {
     clearError,
     fetchUMSById
 } from '../../features/UMS/UMSManagementSlice';
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
+
+export const useUMSSettings = () => {
+    const { id } = useParams<{ id: string }>();
+    const { fetchUMS, ums } = useUMSDetail();
+
+    const [activeTab, setActiveTab] = useState('general');
+    const [showPassword, setShowPassword] = useState(false);
+    const [unsavedChanges, setUnsavedChanges] = useState(false);
+    const [formData, setFormData] = useState<UMSForm>({});
+
+    const dispatch = useDispatch();
+    const currentUMS = useSelector((state: RootState) => state.umsManagement.currentUMS);
+
+    // Fetch from backend only once and update global state
+    useEffect(() => {
+        if (id && !currentUMS) {
+            fetchUMS(id);
+        }
+    }, [fetchUMS, id, currentUMS]);
+
+    // Update global state when we get data from backend
+    useEffect(() => {
+        if (ums && (!currentUMS || currentUMS.id !== ums.id)) {
+            dispatch(setCurrentUMS(ums));
+        }
+    }, [dispatch, ums, currentUMS]);
+
+    // Initialize form data from global state
+    useEffect(() => {
+        if (currentUMS) {
+            setFormData({
+                umsName: currentUMS.umsName || '',
+                umsTagline: currentUMS.umsTagline || '',
+                umsDescription: currentUMS.umsDescription || '',
+                umsWebsite: currentUMS.umsWebsite || '',
+                umsSize: currentUMS.umsSize || '',
+                umsType: currentUMS.umsType || undefined,
+                adminName: currentUMS.adminName || '',
+                adminEmail: currentUMS.adminEmail || '',
+                adminPhone: currentUMS.adminPhone || '',
+                enable2FA: currentUMS.enable2FA || false,
+                // defaultPassword: 'password123', // This would come from API
+                modules: currentUMS.modules || [],
+                platforms: currentUMS.platforms || {},
+                roles: currentUMS.roles || [],
+                departments: currentUMS.departments || []
+            });
+        }
+    }, [currentUMS]);
+
+    const handleInputChange = (field: string, value: any) => {
+        setFormData(prev => ({ ...prev, [field]: value }));
+        setUnsavedChanges(true);
+    };
+
+    // Fix 4: Add role-specific update functions that also update global state
+    const updateFormDataRoles = (newRoles: Role[]) => {
+        setFormData(prev => ({ ...prev, roles: newRoles }));
+        setUnsavedChanges(true);
+        
+        // Also update global state to keep it in sync
+        if (currentUMS) {
+            dispatch(setCurrentUMS({ ...currentUMS, roles: newRoles }));
+        }
+    };
+
+    const handleSave = () => {
+        // API call to save changes
+        console.log('Saving changes:', formData);
+        setUnsavedChanges(false);
+        
+        // Update global state with saved data
+        if (currentUMS) {
+            dispatch(setCurrentUMS({ ...currentUMS, ...formData }));
+        }
+    };
+
+    const tabs = [
+        { id: 'general', label: 'General', icon: Settings },
+        { id: 'admin', label: 'Admin', icon: Crown },
+        { id: 'security', label: 'Security', icon: Shield },
+        { id: 'roles', label: 'Roles & Permissions', icon: Key },
+        { id: 'departments', label: 'Departments', icon: School2Icon },
+        { id: 'modules', label: 'Modules & Platforms', icon: Database },
+        { id: 'danger', label: 'Danger Zone', icon: AlertTriangle }
+    ];
+
+    return {
+        id,
+        activeTab,
+        setActiveTab,
+        showPassword,
+        setShowPassword,
+        unsavedChanges,
+        setUnsavedChanges,
+        formData,
+        setFormData,
+        updateFormDataRoles, // Fix 5: Add this helper function
+        tabs,
+        handleInputChange,
+        handleSave,
+        currentUMS // Fix 6: Expose currentUMS for other components
+    }
+}
 
 
 export const useUMSDetail = () => {
@@ -55,6 +168,11 @@ export const useUMSManagement = () => {
     const fetchUMSs = useCallback(() => {
         dispatch(fetchAllUMS());
     }, [dispatch]);
+
+
+    useEffect(() => {
+        fetchUMSs();
+    }, [fetchUMSs]);
     const addUMS = (newUMS: Omit<UMS, 'id'>) => dispatch(createUMS(newUMS));
     const modifyUMS = (id: string, data: Partial<UMS>) => dispatch(updateUMS({ id, data }));
     const removeUMS = (id: string) => dispatch(deleteUMS(id));
@@ -101,7 +219,7 @@ export const usePermissions = () => {
 
             // Assuming the response.data matches the PermissionsData structure
             setPermissions(response.data || null);
-            console.log('Permissions loaded:', response.data);
+            // console.log('Permissions loaded:', response.data);
             setError(null);
         } catch (err: unknown) {
             console.error('Error fetching permissions:', err);
@@ -191,6 +309,7 @@ export const useCreateUMS = () => {
     };
 
     const updateRole = (index: number, updatedRole: Partial<Role>) => {
+        console.log("Updating role at index:", index, "with data:", updatedRole);
         dispatch(handleUpdateRole({ index, role: updatedRole }));
     };
 
@@ -214,7 +333,7 @@ export const useCreateUMS = () => {
     // Submit the UMS
     const submitUMS = async (form: UMSForm) => {
 
-        if(!form.umsName || !form.adminName || !form.adminEmail) {
+        if (!form.umsName || !form.adminName || !form.adminEmail) {
             toast.error("Please fill in all required fields");
             return;
         }

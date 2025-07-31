@@ -21,7 +21,7 @@ const MediaSettings: React.FC<MediaSettingsProps> = ({
         <div className="flex items-center space-x-4">
           {logoUrl && (
             <img
-              src={`http://localhost:8000${logoUrl}`}
+              src={logoUrl}
               alt="Logo"
               className="h-12 w-12 rounded-lg object-cover"
             />
@@ -44,7 +44,7 @@ const MediaSettings: React.FC<MediaSettingsProps> = ({
         <div className="flex items-center space-x-4">
           {photoUrl && (
             <img
-              src={`http://localhost:8000${photoUrl}`}
+              src={photoUrl}
               alt="Campus"
               className="h-12 w-20 rounded-lg object-cover"
             />

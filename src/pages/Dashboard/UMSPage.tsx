@@ -259,7 +259,7 @@ const UMSPage = () => {
                                             >
                                                 {ums.umsLogoUrl ? (
                                                     <img
-                                                        src={`http://localhost:8000${ums.umsLogoUrl}?w=40&h=40&fit=crop`}
+                                                        src={`${ums.umsLogoUrl}?w=40&h=40&fit=crop`}
                                                         alt={`${ums.umsName} logo`}
                                                         className="w-10 h-10 object-cover rounded-full border-2 border-gray-200 mr-4"
                                                     />

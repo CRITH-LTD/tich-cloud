@@ -281,7 +281,7 @@ export const useCreateUMS = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { currentStep, formData } = useSelector((state: RootState) => state.umsCreation);
-
+    const [isLaunching, setIsLaunching] = useState(false);
 
     // Generic field updater
     const updateField = <K extends keyof UMSForm>(field: K, value: UMSForm[K]) => {
@@ -338,6 +338,8 @@ export const useCreateUMS = () => {
             return;
         }
         try {
+            setIsLaunching(true);
+            // Prepare form data for submission
             const formData = new FormData();
 
             // Utility to convert a URL (dataURL/object URL) to a File
@@ -387,6 +389,8 @@ export const useCreateUMS = () => {
             if (response.status < 200 || response.status >= 300) {
                 throw new Error("UMS submission failed");
             }
+
+            setIsLaunching(false);
             // Toast proper feed back
             navigate("/dashboard/ums")
             toast.success("UMS submitted successfully");
@@ -420,6 +424,8 @@ export const useCreateUMS = () => {
         updateUserInRole,
         removeUserFromRole,
         submitUMS,
+        isLaunching,
+        // Navigation methods
         next,
         back,
         reset,

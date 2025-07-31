@@ -81,7 +81,7 @@ const UMSDetailPage: React.FC = () => {
                                 {ums.umsLogoUrl && (
                                     <div className="relative">
                                         <img
-                                            src={`http://localhost:8000${ums.umsLogoUrl}`}
+                                            src={ums.umsLogoUrl}
                                             alt="UMS Logo"
                                             className="h-16 w-16 rounded-xl object-cover ring-4 ring-blue-100"
                                         />
@@ -200,7 +200,7 @@ const UMSDetailPage: React.FC = () => {
                                 <InfoCard title="Campus View" icon={Camera}>
                                     <div className="rounded-lg overflow-hidden">
                                         <img
-                                            src={`http://localhost:8000${ums.umsPhotoUrl}`}
+                                            src={ums.umsPhotoUrl}
                                             alt="Campus"
                                             className="w-full h-64 object-cover hover:scale-105 transition-transform duration-300"
                                             onError={(e) => {

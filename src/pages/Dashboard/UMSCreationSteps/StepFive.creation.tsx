@@ -3,6 +3,7 @@ import { useCreateUMS } from "../dashboard.hooks";
 import { MODULE_TIERS } from "../../../constants/constants";
 import { toast } from "react-toastify";
 import { useState } from "react";
+import LoadingSpinner from "./UMSSettings/components/LoadingSpinner";
 
 
 const StepFive = () => {
@@ -10,7 +11,8 @@ const StepFive = () => {
         form,
         back,
         goToTheStep,
-        submitUMS
+        submitUMS,
+        isLaunching,
     } = useCreateUMS();
 
     const platformPricing = {
@@ -381,9 +383,10 @@ const StepFive = () => {
                 </button>
                 <button
                     onClick={() => submitUMS(form)}
-                    className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all flex items-center gap-2"
+                    className={`bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all flex items-center gap-2 ${isLaunching ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                    Launch UMS
+
+                    {isLaunching ? <LoadingSpinner /> : 'Launch UMS'}
                     <Rocket className="h-4 w-4" />
                 </button>
             </div>

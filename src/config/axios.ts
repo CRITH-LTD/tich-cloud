@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000',
-  // baseURL: 'https://tich-sl9r.onrender.com',
+  // baseURL: 'http://localhost:8000',
+  baseURL: 'https://tich-sl9r.onrender.com',
   // baseURL: 'http://192.168.0.114:8000',
 });
 

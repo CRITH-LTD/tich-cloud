@@ -17,7 +17,7 @@ import ModulesSettings from './../ModulesSettings';
 import SettingsLayout from './../SettingsLayout';
 import RolesSettings from './../RolesSettings';
 import DepartmentsSettings from './../DepartmentsSettings';
-import RoleDrawer from './../RoleDrawer';
+import RoleDrawer from '../RoleDrawing/RoleDrawer';
 import GeneralSettings from './../GeneralSettings';
 import ErrorMessage from './../ErrorMessage';
 

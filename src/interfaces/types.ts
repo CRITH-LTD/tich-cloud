@@ -51,6 +51,14 @@ export type UMSForm = {
   };
 };
 
+
+export type errorTypeAPI = {
+  response: data
+}
+
+type data = {
+  data: { message: string }
+}
 export interface department {
   id: string;
   name: string;

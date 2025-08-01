@@ -27,7 +27,7 @@ import {
     updateUserInRole as handleUpdateUserInRole,
     removeUserFromRole as handleRemoveUserFromRole,
 } from '../../features/UMS/UMSCreationSlice'; // Adjust the path to your slice file
-import { PermissionsData, Role, RoleUser, UMS, UMSForm } from "../../interfaces/types";
+import { errorTypeAPI, PermissionsData, Role, RoleUser, UMS, UMSForm } from "../../interfaces/types";
 import api from "../../config/axios";
 import { toast } from "react-toastify";
 import {
@@ -48,6 +48,8 @@ export const useUMSSettings = () => {
     const [activeTab, setActiveTab] = useState('general');
     const [showPassword, setShowPassword] = useState(false);
     const [unsavedChanges, setUnsavedChanges] = useState(false);
+    const [isUpdating, setIsUpdating] = useState(false);
+    const [savingError, setSavingError] = useState<string | null>(null);
     const [formData, setFormData] = useState<UMSForm>({});
 
     const dispatch = useDispatch();
@@ -71,6 +73,8 @@ export const useUMSSettings = () => {
     useEffect(() => {
         if (currentUMS) {
             setFormData({
+                umsLogo: currentUMS.umsLogoUrl || '',
+                umsPhoto: currentUMS.umsPhotoUrl || '',
                 umsName: currentUMS.umsName || '',
                 umsTagline: currentUMS.umsTagline || '',
                 umsDescription: currentUMS.umsDescription || '',
@@ -90,30 +94,114 @@ export const useUMSSettings = () => {
         }
     }, [currentUMS]);
 
-    const handleInputChange = (field: string, value: any) => {
+    const handleInputChange = <K extends keyof UMSForm>(field: K, value: UMSForm[K]) => {
+        console.log("in handle Input in Hooks", {field, value})
         setFormData(prev => ({ ...prev, [field]: value }));
+        dispatch(handleUpdateField({ field, value }))
+        console.log("formdata in hooks", formData)
         setUnsavedChanges(true);
     };
+
+    // const updateField = <K extends keyof UMSForm>(field: K, value: UMSForm[K]) => {
+    //     console.log("field", {field, value})
+    //     dispatch(handleUpdateField({ field, value }));
+    // };
 
     // Fix 4: Add role-specific update functions that also update global state
     const updateFormDataRoles = (newRoles: Role[]) => {
         setFormData(prev => ({ ...prev, roles: newRoles }));
         setUnsavedChanges(true);
-        
+
         // Also update global state to keep it in sync
         if (currentUMS) {
             dispatch(setCurrentUMS({ ...currentUMS, roles: newRoles }));
         }
     };
 
-    const handleSave = () => {
-        // API call to save changes
-        console.log('Saving changes:', formData);
-        setUnsavedChanges(false);
-        
-        // Update global state with saved data
-        if (currentUMS) {
-            dispatch(setCurrentUMS({ ...currentUMS, ...formData }));
+    const getFormDataForUpdate = (currentData: any, originalData: any) => {
+        const payload = new FormData();
+        let hasChanges = false;
+
+        // Iterate over the current form data
+        for (const key in currentData) {
+            // Skip keys that are not part of the update payload (e.g., internal component state)
+            if (key === 'id' || key === '_id') {
+                continue;
+            }
+
+            const currentValue = currentData[key];
+            const originalValue = originalData[key];
+
+            // --- Logic to detect changes ---
+            if (
+                // Always include files, as they are considered new changes
+                currentValue instanceof File ||
+                // Check for a change in value for primitive types
+                (typeof currentValue !== 'object' && currentValue !== originalValue) ||
+                // Check for changes in objects and arrays by stringifying them
+                (typeof currentValue === 'object' && JSON.stringify(currentValue) !== JSON.stringify(originalValue))
+            ) {
+                hasChanges = true;
+                // Append the changed field to the FormData payload
+                if (currentValue instanceof File) {
+                    payload.append(key, currentValue);
+                } else if (typeof currentValue === 'object') {
+                    payload.append(key, JSON.stringify(currentValue));
+                } else {
+                    payload.append(key, currentValue);
+                }
+            }
+        }
+
+        return hasChanges ? payload : null;
+    };
+
+
+    const handleSave = async () => {
+        // --- 1. Guard against unnecessary or duplicate calls ---
+        if (!unsavedChanges || isUpdating || !currentUMS) {
+            return;
+        }
+
+        // --- 2. Manage loading and error states ---
+        setIsUpdating(true);
+        setSavingError(null);
+
+        try {
+            // --- 3. Get the payload with only the changed fields ---
+            const payload = getFormDataForUpdate(formData, currentUMS);
+
+            // If there are no actual changes, exit early
+            if (!payload) {
+                console.log('No changes detected. Skipping API call.');
+                toast.info('No changes to save.', { autoClose: 2000 });
+                setUnsavedChanges(false);
+                return;
+            }
+
+            // --- 4. Make the API call to your backend's PATCH endpoint ---
+            const response = await api.patch(`/ums/${currentUMS.id}`, payload, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            // --- 5. Handle a successful response ---
+            const updatedUms = response.data;
+            console.log('Successfully saved changes:', updatedUms);
+            dispatch(setCurrentUMS(updatedUms));
+            setUnsavedChanges(false);
+            toast.success('Changes saved successfully!', { autoClose: 2000 });
+
+        } catch (err) {
+            console.error('Failed to save changes:', err);
+            const deError = err
+            console.log(deError)
+            const errorMessage = deError.response?.data?.message.message || 'An unexpected error occurred.';
+            setSavingError(errorMessage);
+            toast.error('Changes not saved', { autoClose: 2000 });
+        } finally {
+            setIsUpdating(false);
         }
     };
 
@@ -134,6 +222,8 @@ export const useUMSSettings = () => {
         showPassword,
         setShowPassword,
         unsavedChanges,
+        isUpdating,
+        savingError,
         setUnsavedChanges,
         formData,
         setFormData,

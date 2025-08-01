@@ -35,6 +35,8 @@ const UMSSettingsPage: React.FC = () => {
         formData,
         currentUMS: ums,
         handleSave,
+        isUpdating,
+        savingError,
         handleInputChange
     } = useUMSSettings();
 
@@ -42,6 +44,7 @@ const UMSSettingsPage: React.FC = () => {
         addRole,
         updateRole,
         removeRole,
+        // updateField,
         addUserToRole,
         updateUserInRole,
         removeUserFromRole
@@ -71,14 +74,14 @@ const UMSSettingsPage: React.FC = () => {
 
     const handleRoleSubmit = async (role: Role, index?: number) => {
         setRoleSubmissionLoading(true);
-        
+
         try {
             if (index !== undefined) {
                 await updateRole(index, role);
             } else {
                 await addRole(role);
             }
-            
+
             // Close drawer after successful submission
             closeRoleDrawer();
         } catch (error) {
@@ -117,6 +120,7 @@ const UMSSettingsPage: React.FC = () => {
                     <GeneralSettings
                         formData={formData}
                         onInputChange={handleInputChange}
+                        // updateField={updateField}
                     />
                 );
             case "admin":
@@ -131,8 +135,8 @@ const UMSSettingsPage: React.FC = () => {
                     <SecuritySettings
                         formData={formData}
                         onInputChange={handleInputChange}
-                        // showPassword={showPassword}
-                        // onTogglePassword={() => setShowPassword(!showPassword)}
+                    // showPassword={showPassword}
+                    // onTogglePassword={() => setShowPassword(!showPassword)}
                     />
                 );
             case "modules":
@@ -171,6 +175,8 @@ const UMSSettingsPage: React.FC = () => {
         <>
             <Breadcrumbs />
             <SettingsLayout
+                isUpdating={isUpdating}
+                savingError={savingError}
                 umsName={ums.umsName}
                 tabs={tabs}
                 activeTab={activeTab}

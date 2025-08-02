@@ -1,17 +1,21 @@
-import React, { useState } from 'react';
-import { Menu, X, ChevronDown, User, Settings, LogOut, HelpCircle } from 'lucide-react';
+import { useState } from 'react';
+import { Menu, X, ChevronDown, HelpCircle } from 'lucide-react';
 import { Link } from 'react-router';
 import { pathnames } from '../routes/path-names';
 import useDashboardLayout from '../pages/Dashboard/dashboard.hooks';
 import { Logo } from './Common/Logo';
+import ShimmerLoader from './Common/ShimmerLoader ';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   // const [notifications, setNotifications] = useState(2); // Mock notification count
 
-  // Get user data from dashboard layout hook
-  const { showMenu, setShowMenu, handleLogout, user, dropdownRef } = useDashboardLayout();
 
+  // Get user data from dashboard layout hook
+   const { showMenu, setShowMenu, handleLogout, user, dropdownRef } = useDashboardLayout();
+
+  // Define loadingUser as true if user is nullish (no user yet)
+  const loadingUser = !user;
 
 
   return (
@@ -30,68 +34,66 @@ const Header = () => {
 
           {/* User Authentication Section */}
           <div className="hidden md:flex items-center space-x-4">
-            {user ? (
+            {loadingUser ? (
               <>
-
-                {/* Help */}
-                <HelpCircle className="h-5 w-5 text-gray-600 hover:text-gray-800 cursor-pointer transition-colors" />
-
-                {/* User Menu */}
-                <div className="relative" ref={dropdownRef}>
-                  <div
-                    className="flex items-center space-x-2 hover:text-gray-800 cursor-pointer px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
-                    onClick={() => setShowMenu(prev => !prev)}
-                  >
-                    <div className="h-8 w-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-medium text-sm">
-                      {(user?.firstName || user?.email || "U").charAt(0).toUpperCase()}
-                    </div>
-                    <div className="text-left">
-                      <div className="text-sm font-medium text-gray-900">{user?.email ? user.email.split('@')[0] : "Admin"}</div>
-                      <div className="text-xs text-gray-500">{user?.email || "user@example.com"}</div>
-                    </div>
-                    <ChevronDown className="h-4 w-4 text-gray-600" />
-                  </div>
-
-                  {showMenu && (
-                    <div className="text-academic-900  absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden z-50">
-                      <div className="px-4 py-3 border-b border-gray-100">
-                        <div className="font-medium text-gray-900">
-                          {user?.email ? user.email.split('@')[0] : "Admin"}
-                        </div>
-                        <div className="text-xs text-gray-500">{user?.email || "admin@example.com"}</div>
-                      </div>
-                      <Link to="/dashboard/profile" className="flex text-xs items-center px-4 py-3 hover:bg-gray-50 transition-colors">
-                        <User className="h-4 w-4 mr-3 text-gray-500" />
-                        <span>My Profile</span>
-                      </Link>
-                      <Link to="/dashboard/settings" className="flex text-xs items-center px-4 py-3 hover:bg-gray-50 transition-colors">
-                        <Settings className="h-4 w-4 mr-3 text-gray-500" />
-                        <span>Settings</span>
-                      </Link>
-                      <Link to="/dashboard/help" className="flex text-xs items-center px-4 py-3 hover:bg-gray-50 transition-colors">
-                        <HelpCircle className="h-4 w-4 mr-3 text-gray-500" />
-                        <span>Help Center</span>
-                      </Link>
-                      <div className="border-t border-gray-100">
-                        <button
-                          onClick={handleLogout}
-                          className="w-full text-xs text-left px-4 py-3 hover:bg-red-50 text-red-600 flex items-center transition-colors"
-                        >
-                          <LogOut className="h-4 w-4 mr-3" />
-                          <span>Sign Out</span>
-                        </button>
-                      </div>
-                    </div>
-                  )}
+                <ShimmerLoader
+                  width={32}
+                  height={32}
+                  borderRadius="50%"
+                  className="inline-block"
+                />
+                <div className="flex flex-col space-y-1 ml-3">
+                  <ShimmerLoader width={80} height={12} borderRadius={4} />
+                  <ShimmerLoader width={100} height={10} borderRadius={4} />
                 </div>
+                <ShimmerLoader width={16} height={16} borderRadius={4} className="ml-2" />
               </>
             ) : (
-              <>
-                <Link to={pathnames.SIGN_IN} className="text-gray-700 hover:text-blue-600 transition-colors font-medium">Console Login</Link>
-                <Link to={pathnames.SIGN_UP} className="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition-all duration-200 transform hover:scale-105 font-medium shadow-lg hover:shadow-xl">
-                  Get Started Free
-                </Link>
-              </>
+              user ? (
+                <>
+                  <HelpCircle className="h-5 w-5 text-gray-600 hover:text-gray-800 cursor-pointer transition-colors" />
+
+                  <div className="relative" ref={dropdownRef}>
+                    <div
+                      className="flex items-center space-x-2 hover:text-gray-800 cursor-pointer px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                      onClick={() => setShowMenu((prev) => !prev)}
+                    >
+                      <div className="h-8 w-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-medium text-sm">
+                        {(user.firstName || user.email)?.charAt(0).toUpperCase() ?? ''}
+                      </div>
+                      <div className="text-left">
+                        <div className="text-sm font-medium text-gray-900">
+                          {user.email ? user.email.split('@')[0] : ''}
+                        </div>
+                        <div className="text-xs text-gray-500">{user.email || ''}</div>
+                      </div>
+                      <ChevronDown className="h-4 w-4 text-gray-600" />
+                    </div>
+
+                    {showMenu && (
+                      <div className="text-academic-900 absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden z-50">
+                        {/* User dropdown menu content */}
+                      </div>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* In case user is null but loadingUser false (unlikely) */}
+                  <Link
+                    to={pathnames.SIGN_IN}
+                    className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
+                  >
+                    Console Login
+                  </Link>
+                  <Link
+                    to={pathnames.SIGN_UP}
+                    className="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition-all duration-200 transform hover:scale-105 font-medium shadow-lg hover:shadow-xl"
+                  >
+                    Get Started Free
+                  </Link>
+                </>
+              )
             )}
           </div>
 

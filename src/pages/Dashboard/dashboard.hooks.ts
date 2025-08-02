@@ -40,6 +40,7 @@ import {
     fetchUMSById
 } from '../../features/UMS/UMSManagementSlice';
 import { useNavigate, useParams } from "react-router";
+import UserInterface from "../../interfaces/user.interface";
 
 export const useUMSSettings = () => {
     const { id } = useParams<{ id: string }>();
@@ -95,7 +96,7 @@ export const useUMSSettings = () => {
     }, [currentUMS]);
 
     const handleInputChange = <K extends keyof UMSForm>(field: K, value: UMSForm[K]) => {
-        console.log("in handle Input in Hooks", {field, value})
+        console.log("in handle Input in Hooks", { field, value })
         setFormData(prev => ({ ...prev, [field]: value }));
         dispatch(handleUpdateField({ field, value }))
         console.log("formdata in hooks", formData)
@@ -523,34 +524,65 @@ export const useCreateUMS = () => {
     };
 };
 
+
+/**
+ * Manages dashboard layout state, including user session and dropdown menu.
+ * 
+ * @returns an object containing user loading state, authentication data, 
+ *          dropdown visibility controls, and logout handler.
+ */
 const useDashboardLayout = () => {
-    const user = useSelector((state: RootState) => state.auth.user);
+    // Grab user from Redux. undefined => still loading; null => not authenticated; object => authenticated
+    const userFromStore = useSelector((state: RootState) => state.auth.user);
+
+    // Local state to distinguish loading vs loaded/null
+    const [user, setUser] = useState<UserInterface | null | undefined>(undefined);
+
+    const [minLoadingTime, setMinLoadingTime] = useState(true);
+    // Dropdown visibility
+    const [showMenu, setShowMenu] = useState<boolean>(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
-    const [showMenu, setShowMenu] = useState(false);
-    const { handleLogout } = useAuthForm({ intent: "signup" })
+
+    // Logout handler from custom auth hook
+    const { handleLogout } = useAuthForm({ intent: 'signup' });
+
+    // Sync local user state with Redux store
+    useEffect(() => {
+        setUser(userFromStore);
+    }, [userFromStore]);
+
 
     useEffect(() => {
+        const timer = setTimeout(() => setMinLoadingTime(false), 1000); // 500ms minimum
+        return () => clearTimeout(timer);
+    }, []);
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (
-                dropdownRef.current &&
-                !dropdownRef.current.contains(event.target as Node)
-            ) {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
                 setShowMenu(false);
             }
         };
 
-        document.addEventListener("mousedown", handleClickOutside);
+        document.addEventListener('mousedown', handleClickOutside);
         return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
+            document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, []);
+    }, [dropdownRef]);
+
+    // Loading indicator: still checking auth status
+      const isLoading = user === undefined || minLoadingTime;
 
     return {
-        showMenu,
-        setShowMenu,
-        user,
-        dropdownRef,
-        handleLogout
+        user,             // User object or null if not signed in
+        isLoading,        // true while auth status is being determined
+        showMenu,         // dropdown open/closed
+        setShowMenu,      // toggle handler
+        dropdownRef,      // ref for click-outside detection
+        handleLogout      // method to sign the user out
     };
-}
+};
+
+
 export default useDashboardLayout;

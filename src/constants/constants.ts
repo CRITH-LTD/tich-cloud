@@ -1,3 +1,11 @@
+import {
+  GraduationCap,
+  Building,
+  Settings,
+  BookOpen,
+  Users,
+  LucideIcon,
+} from 'lucide-react';
 
 export const MODULE_TIERS = {
     "Student Information": {
@@ -421,3 +429,170 @@ export const MODULE_TIERS = {
         }
     }
 }
+
+interface MatriculeConfig {
+  name: string;
+  category: string;
+  format: string;
+  placeholders: Record<string, string>;
+  sequenceLength: number;
+  description: string;
+  icon: LucideIcon; // assuming LucideIcon is aliased as any or properly typed elsewhere
+}
+
+export const templateSuggestions: MatriculeConfig[] = [
+  // Public Universities
+  {
+    name: 'University of Yaoundé I',
+    category: 'Universities',
+    format: '{{YY}}{{series}}{{sequence}}',
+    placeholders: { YY: '19', series: 'K', sequence: '2776' },
+    sequenceLength: 4,
+    description: 'Example: 19K2776 (Faculty of Science, 2019)',
+    icon: GraduationCap,
+  },
+  {
+    name: 'University of Douala',
+    category: 'Universities',
+    format: '{{YY}}{{deptLetter}}{{sequence}}',
+    placeholders: { YY: '22', deptLetter: 'I', sequence: '01174' },
+    sequenceLength: 5,
+    description: 'Example: 22I01174 (IUT student, 2022)',
+    icon: GraduationCap,
+  },
+  {
+    name: 'University of Dschang',
+    category: 'Universities',
+    format: 'UDS-{{YY}}{{facCode}}{{sequence}}',
+    placeholders: { YY: '24', facCode: 'AGR', sequence: '1234' },
+    sequenceLength: 4,
+    description: 'Example: UDS-24AGR1234 (Agronomy, 2024)',
+    icon: GraduationCap,
+  },
+  {
+    name: 'University of Buea',
+    category: 'Universities',
+    format: '{{facCode}}{{YY}}{{series}}{{sequence}}',
+    placeholders: { facCode: 'SC', YY: '20', series: 'B', sequence: '764' },
+    sequenceLength: 3,
+    description: 'Example: SC20B764 (Faculty of Science, 2020)',
+    icon: GraduationCap,
+  },
+  {
+    name: 'University of Bamenda',
+    category: 'Universities',
+    format: '{{SchoolCode}}{{YY}}{{ProgramCode}}{{sequence}}',
+    placeholders: { SchoolCode: 'HTTTC', YY: '24', ProgramCode: 'TED', sequence: '056' },
+    sequenceLength: 3,
+    description: 'Example: HTTTC24TED056 (UBa, TED program)',
+    icon: GraduationCap,
+  },
+
+  // Grandes Écoles
+  {
+    name: 'ENAM (École Nationale d’Administration et de Magistrature)',
+    category: 'Grandes Écoles',
+    format: '{{DivisionCode}}{{Cycle}}{{sequence}}',
+    placeholders: { DivisionCode: 'AGB', Cycle: 'B', sequence: '1067' },
+    sequenceLength: 4,
+    description: 'Example: AGB1067 (Admin Générale Cycle B)',
+    icon: Building,
+  },
+  {
+    name: 'IRIC (Institut des Relations Internationales du Cameroun)',
+    category: 'Grandes Écoles',
+    format: 'IRIC{{YY}}{{Section}}{{sequence}}',
+    placeholders: { YY: '24', Section: 'DIP', sequence: '001' },
+    sequenceLength: 3,
+    description: 'Example: IRIC24DIP001 (Diplomacy, 2024)',
+    icon: Building,
+  },
+  {
+    name: 'ESSEC (École Supérieure des Sciences Économiques et Commerciales)',
+    category: 'Grandes Écoles',
+    format: 'ESSEC/{{Campus}}/{{Program}}/{{YY}}/{{sequence}}',
+    placeholders: { Campus: 'YDE', Program: 'GF', YY: '24', sequence: '0001' },
+    sequenceLength: 4,
+    description: 'Example: ESSEC/YDE/GF/24/0001',
+    icon: Building,
+  },
+
+  // Technical Schools
+  {
+    name: 'IUT (Institut Universitaire de Technologie)',
+    category: 'Technical Schools',
+    format: 'IUT{{City}}/{{Dept}}/{{YY}}/{{sequence}}',
+    placeholders: { City: 'DLA', Dept: 'GEA', YY: '24', sequence: '0001' },
+    sequenceLength: 4,
+    description: 'Example: IUTDLA/GEA/24/0001',
+    icon: Settings,
+  },
+  {
+    name: 'ENSP (École Nationale Supérieure Polytechnique)',
+    category: 'Technical Schools',
+    format: 'ENSP/{{Dept}}/{{Cycle}}/{{YY}}{{sequence}}',
+    placeholders: { Dept: 'GIN', Cycle: 'ING', YY: '24', sequence: '023' },
+    sequenceLength: 3,
+    description: 'Example: ENSP/GIN/ING/24023',
+    icon: Settings,
+  },
+
+  // Secondary Schools
+  {
+    name: 'Lycée Général Leclerc',
+    category: 'Secondary Schools',
+    format: 'LGL/{{Series}}/{{Class}}/{{YY}}/{{sequence}}',
+    placeholders: { Series: 'C', Class: 'TLE', YY: '24', sequence: '001' },
+    sequenceLength: 3,
+    description: 'Example: LGL/C/TLE/24/001',
+    icon: BookOpen,
+  },
+  {
+    name: 'Collège de la Retraite',
+    category: 'Secondary Schools',
+    format: 'CDR{{YY}}{{Class}}{{sequence}}',
+    placeholders: { YY: '24', Class: '6EME', sequence: '01' },
+    sequenceLength: 2,
+    description: 'Example: CDR246EME01',
+    icon: BookOpen,
+  },
+
+  // Private Institutions
+  {
+    name: 'Institut Supérieur de Management',
+    category: 'Private Institutions',
+    format: 'ISM/{{Campus}}/{{Program}}/{{Intake}}/{{sequence}}',
+    placeholders: { Campus: 'YDE', Program: 'MBA', Intake: '2024', sequence: '0001' },
+    sequenceLength: 4,
+    description: 'Example: ISM/YDE/MBA/2024/0001',
+    icon: Users,
+  },
+  {
+    name: 'UCAC (Université Catholique d’Afrique Centrale)',
+    category: 'Private Institutions',
+    format: 'UCAC/{{Faculty}}/{{YY}}/{{sequence}}',
+    placeholders: { Faculty: 'FGSE', YY: '24', sequence: '00001' },
+    sequenceLength: 5,
+    description: 'Example: UCAC/FGSE/24/00001',
+    icon: Users,
+  },
+  {
+    name: 'HIMS Buea (Higher Institute of Management Studies)',
+    category: 'Private Institutions',
+    format: 'HIMS/{{Program}}/{{YY}}/{{sequence}}',
+    placeholders: { Program: 'BTECH', YY: '24', sequence: '0001' },
+    sequenceLength: 4,
+    description: 'Example: HIMS/BTECH/24/0001',
+    icon: Users,
+  },
+  {
+    name: 'HIBMAT Buea (Higher Institute of Business Management and Technology)',
+    category: 'Private Institutions',
+    format: 'HIBMAT/{{Dept}}/{{YY}}/{{sequence}}',
+    placeholders: { Dept: 'ACC', YY: '24', sequence: '0001' },
+    sequenceLength: 4,
+    description: 'Example: HIBMAT/ACC/24/0001',
+    icon: Users,
+  }
+];
+

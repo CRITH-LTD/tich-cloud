@@ -440,16 +440,32 @@ export const useCreateUMS = () => {
                 return new File([blob], fileName, { type: blob.type });
             };
 
+            // First, transform the array of 'Role' objects to the 'RoleToBack' type
+            const rolesToBack = form.roles.map(role => {
+                // For each role, extract just the 'id' from the permissions array
+                const permissionIds = role.permissions.map(permission => permission.id);
+
+                // Return a new object that matches the 'RoleToBack' structure
+                return {
+                    name: role.name,
+                    description: role.description,
+                    permissionIds: permissionIds,
+                    users: role.users,
+                };
+            });
             // Append logo image
             if (form.umsLogo) {
                 const logoFile = await urlToFile(form.umsLogo, "ums-logo.png");
+                console.log(logoFile);
                 formData.append("umsLogo", logoFile);
+                console.log("umsLogo", logoFile)
             }
 
             // Append photo image
             if (form.umsPhoto) {
                 const photoFile = await urlToFile(form.umsPhoto, "ums-photo.png");
                 formData.append("umsPhoto", photoFile);
+                console.log("umsPhoto", photoFile)
             }
 
             // Append primitive fields
@@ -466,7 +482,7 @@ export const useCreateUMS = () => {
             formData.append("enable2FA", String(form.enable2FA ?? false));
 
             // Append arrays/objects as JSON strings
-            formData.append("roles", JSON.stringify(form.roles));
+            formData.append("roles", JSON.stringify(rolesToBack));
             formData.append("modules", JSON.stringify(form.modules));
             formData.append("platforms", JSON.stringify(form.platforms));
 
@@ -572,7 +588,7 @@ const useDashboardLayout = () => {
     }, [dropdownRef]);
 
     // Loading indicator: still checking auth status
-      const isLoading = user === undefined || minLoadingTime;
+    const isLoading = user === undefined || minLoadingTime;
 
     return {
         user,             // User object or null if not signed in

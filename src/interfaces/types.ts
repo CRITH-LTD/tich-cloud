@@ -1,5 +1,6 @@
 import { AuthState } from '../features/auth/authSlice';
 import { UMSCreationState } from '../features/UMS/UMSCreationSlice';
+import { Department } from '../types/ums-settings.types';
 
 export type RoleUser = {
   email: string;
@@ -17,6 +18,13 @@ export type PermissionsRoles = {
   name: string;
   description: string;
 }
+
+export type RoleToBack = {
+  name: string;
+  description?: string;
+  permissionIds: string[];
+  users: RoleUser[];
+}
 export type Role = {
   name: string;
   description?: string;
@@ -24,31 +32,50 @@ export type Role = {
   users: RoleUser[];
 };
 
+// A type to represent a matricule configuration for the form
+export type MatriculeConfig = {
+  format?: string;
+  placeholders?: Record<string, string>;
+  sequenceLength?: number;
+};
+
+// A type to represent a file that can either be a new upload or an existing URL
+export type FileWithUrl = File | string;
+
+/**
+ * Represents the data structure for the UMS creation and update form.
+ */
 export type UMSForm = {
+  // --- UMS Details ---
   umsName: string;
+  umsTagline?: string;
+  umsDescription: string;
+  umsWebsite?: string;
+  umsType?: 'University' | 'College' | 'School';
+  umsSize?: string;
+  
+  // --- File Uploads (can be a File object or an existing URL string) ---
   umsLogo?: string;
   umsPhoto?: string;
-  umsDescription: string;
-  umsTagline?: string;
-  umsWebsite?: string;
-  umsType?: "University" | "College" | "School" | undefined;
-  umsSize?: string;
-  departments?: department[];
 
+  // --- Administration Details ---
   adminName: string;
   adminEmail: string;
   adminPhone?: string;
   enable2FA: boolean;
 
+  // --- Modules and Access Configuration ---
   roles: Role[];
-
   modules: string[];
-
   platforms: {
     teacherApp: boolean;
     studentApp: boolean;
     desktopOffices: string[];
   };
+
+  // --- Dynamic Configuration ---
+  departments?: Department[]; // Placeholder for Departments
+  matriculeConfig?: MatriculeConfig; // NEW: The matricule configuration
 };
 
 

@@ -90,13 +90,13 @@ const UMSPage = () => {
                             <RefreshCw className="h-4 w-4" />
                             Refresh
                         </button>
-                        <button
+                        {/* <button
                             onClick={() => navigate(pathnames.CRATE_UMS)}
                             className="inline-flex items-center gap-2 bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow-md"
                         >
                             <Plus className="h-4 w-4" />
                             Create New UMS
-                        </button>
+                        </button> */}
                     </div>
                 </div>
 

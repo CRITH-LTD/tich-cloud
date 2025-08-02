@@ -7,7 +7,7 @@ import UserMenu from './UserMenu';
 import useDashboardLayout from '../dashboard.hooks';
 import { initializeAdminEmail } from '../../../features/UMS/UMSCreationSlice';
 import { Logo } from '../../../components/Common/Logo';
-import SearchBox from './Searchbox';
+import SearchBox from './SearchBox';
 
 interface Service {
     id: number;

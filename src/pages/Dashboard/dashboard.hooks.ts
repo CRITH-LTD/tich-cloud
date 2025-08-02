@@ -27,7 +27,7 @@ import {
     updateUserInRole as handleUpdateUserInRole,
     removeUserFromRole as handleRemoveUserFromRole,
 } from '../../features/UMS/UMSCreationSlice'; // Adjust the path to your slice file
-import { errorTypeAPI, PermissionsData, Role, RoleUser, UMS, UMSForm } from "../../interfaces/types";
+import { ApiErrorResponse, errorTypeAPI, PermissionsData, Role, RoleUser, UMS, UMSForm, UMSUpdateResponse } from "../../interfaces/types";
 import api from "../../config/axios";
 import { toast } from "react-toastify";
 import {
@@ -169,8 +169,15 @@ export const useUMSSettings = () => {
         setSavingError(null);
 
         try {
-            // --- 3. Get the payload with only the changed fields ---
-            const payload = getFormDataForUpdate(formData, currentUMS);
+            // --- 3. Utility function to convert URL to File ---
+            const urlToFile = async (url: string, fileName: string): Promise<File> => {
+                const res = await fetch(url);
+                const blob = await res.blob();
+                return new File([blob], fileName, { type: blob.type });
+            };
+
+            // --- 4. Get the payload with only the changed fields ---
+            let payload = getFormDataForUpdate(formData, currentUMS);
 
             // If there are no actual changes, exit early
             if (!payload) {
@@ -180,27 +187,74 @@ export const useUMSSettings = () => {
                 return;
             }
 
-            // --- 4. Make the API call to your backend's PATCH endpoint ---
-            const response = await api.patch(`/ums/${currentUMS.id}`, payload, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
+            // --- 5. Handle file conversions if payload is FormData ---
+            if (payload instanceof FormData) {
+                // Create a new FormData to rebuild with proper files
+                const enhancedPayload = new FormData();
 
-            // --- 5. Handle a successful response ---
-            const updatedUms = response.data;
+                // Copy all existing entries
+                for (const [key, value] of payload.entries()) {
+                    if (key === 'umsLogo' || key === 'umsPhoto') {
+                        // If the value is a URL string, convert it to a File
+                        if (typeof value === 'string' && (value.startsWith('data:') || value.startsWith('blob:') || value.startsWith('http'))) {
+                            try {
+                                const fileName = key === 'umsLogo' ? 'ums-logo.png' : 'ums-photo.png';
+                                const file = await urlToFile(value, fileName);
+                                enhancedPayload.append(key, file);
+                                console.log(`Converted ${key} URL to File:`, file);
+                            } catch (error) {
+                                console.warn(`Failed to convert ${key} URL to File:`, error);
+                                // Fallback: append as string (backend should handle this)
+                                enhancedPayload.append(key, value);
+                            }
+                        } else {
+                            // Already a File or other valid value
+                            enhancedPayload.append(key, value);
+                        }
+                    } else {
+                        // Non-file fields
+                        enhancedPayload.append(key, value);
+                    }
+                }
+
+                payload = enhancedPayload;
+            }
+
+            // --- 6. Make the API call with proper typing ---
+            const response = payload instanceof FormData
+                ? await api.patchFormData<UMSUpdateResponse>(`/ums/${currentUMS.id}`, payload)
+                : await api.patch<UMSUpdateResponse>(`/ums/${currentUMS.id}`, payload);
+
+            // --- 7. Handle a successful response ---
+            const updatedUms = response.data.data || response.data; // Handle both response formats
             console.log('Successfully saved changes:', updatedUms);
             dispatch(setCurrentUMS(updatedUms));
             setUnsavedChanges(false);
             toast.success('Changes saved successfully!', { autoClose: 2000 });
 
-        } catch (err) {
+        } catch (err: any) {
             console.error('Failed to save changes:', err);
-            const deError = err
-            console.log(deError)
-            const errorMessage = deError.response?.data?.message.message || 'An unexpected error occurred.';
+
+            // --- 8. Enhanced error handling ---
+            let errorMessage = 'An unexpected error occurred.';
+
+            if (err?.response?.data) {
+                const errorData = err.response.data as ApiErrorResponse;
+
+                if (typeof errorData.message === 'object' && errorData.message?.message) {
+                    errorMessage = errorData.message.message;
+                } else if (typeof errorData.message === 'string') {
+                    errorMessage = errorData.message;
+                } else if (errorData.error) {
+                    errorMessage = errorData.error;
+                }
+            } else if (err?.message) {
+                errorMessage = err.message;
+            }
+
             setSavingError(errorMessage);
-            toast.error('Changes not saved', { autoClose: 2000 });
+            toast.error(`Failed to save changes: ${errorMessage}`, { autoClose: 4000 });
+
         } finally {
             setIsUpdating(false);
         }

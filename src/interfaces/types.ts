@@ -13,6 +13,18 @@ export interface RootState {
   umsCreation: UMSCreationState;
 }
 
+export interface UMSUpdateResponse {
+    data: UMS; // Your UMS type
+    message: string;
+    success: boolean;
+}
+
+// Define error response type
+export interface ApiErrorResponse {
+    message?: string | { message: string };
+    error?: string;
+    statusCode?: number;
+}
 export type PermissionsRoles = {
   id: string;
   name: string;

@@ -114,38 +114,38 @@ class APIClient {
 
   // Request interceptor logic
   private handleRequest(config: InternalAxiosRequestConfig): InternalAxiosRequestConfig {
-  const token = this.getValidToken();
+    const token = this.getValidToken();
 
-  if (token && config.headers) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
-  // Set Content-Type only if not already set and data is not FormData
-  if (config.headers && !config.headers['Content-Type']) {
-    // Check if the data is FormData
-    const isFormData = config.data instanceof FormData;
-    
-    if (!isFormData) {
-      config.headers['Content-Type'] = 'application/json';
+    if (token && config.headers) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
-    // If it's FormData, let axios set the Content-Type with boundary automatically
+
+    // Set Content-Type only if not already set and data is not FormData
+    if (config.headers && !config.headers['Content-Type']) {
+      // Check if the data is FormData
+      const isFormData = config.data instanceof FormData;
+
+      if (!isFormData) {
+        config.headers['Content-Type'] = 'application/json';
+      }
+      // If it's FormData, let axios set the Content-Type with boundary automatically
+    }
+
+    // Initialize metadata for tracking
+    const metadata: RequestMetadata = {
+      retryCount: 0,
+      startTime: Date.now(),
+    };
+
+    (config as ExtendedAxiosRequestConfig).metadata = metadata;
+
+    // Add request ID for debugging
+    if (config.headers) {
+      (config.headers as AxiosRequestHeaders)['X-Request-ID'] = this.generateRequestId();
+    }
+
+    return config;
   }
-
-  // Initialize metadata for tracking
-  const metadata: RequestMetadata = {
-    retryCount: 0,
-    startTime: Date.now(),
-  };
-
-  (config as ExtendedAxiosRequestConfig).metadata = metadata;
-
-  // Add request ID for debugging
-  if (config.headers) {
-    (config.headers as AxiosRequestHeaders)['X-Request-ID'] = this.generateRequestId();
-  }
-
-  return config;
-}
 
   private handleRequestError(error: AxiosError): Promise<AxiosError> {
     console.error('Request setup failed:', error);
@@ -190,6 +190,70 @@ class APIClient {
     }
   }
 
+  // Add these methods to your APIClient class:
+
+  public postFormData<T = unknown>(
+    url: string,
+    data: FormData,
+    config: Partial<ExtendedAxiosRequestConfig> = {}
+  ): Promise<AxiosResponse<T>> {
+    const formDataConfig = {
+      ...config,
+      headers: {
+        ...config.headers,
+        // Don't set Content-Type for FormData - let axios handle it
+      }
+    };
+
+    // Remove Content-Type if it exists
+    if (formDataConfig.headers && 'Content-Type' in formDataConfig.headers) {
+      delete formDataConfig.headers['Content-Type'];
+    }
+
+    return this.client.post(url, data, formDataConfig);
+  }
+
+  public patchFormData<T = unknown>(
+    url: string,
+    data: FormData,
+    config: Partial<ExtendedAxiosRequestConfig> = {}
+  ): Promise<AxiosResponse<T>> {
+    const formDataConfig = {
+      ...config,
+      headers: {
+        ...config.headers,
+        // Don't set Content-Type for FormData - let axios handle it
+      }
+    };
+
+    // Remove Content-Type if it exists
+    if (formDataConfig.headers && 'Content-Type' in formDataConfig.headers) {
+      delete formDataConfig.headers['Content-Type'];
+    }
+
+    return this.client.patch(url, data, formDataConfig);
+  }
+
+  public putFormData<T = unknown>(
+    url: string,
+    data: FormData,
+    config: Partial<ExtendedAxiosRequestConfig> = {}
+  ): Promise<AxiosResponse<T>> {
+    const formDataConfig = {
+      ...config,
+      headers: {
+        ...config.headers,
+        // Don't set Content-Type for FormData - let axios handle it
+      }
+    };
+
+    // Remove Content-Type if it exists
+    if (formDataConfig.headers && 'Content-Type' in formDataConfig.headers) {
+      delete formDataConfig.headers['Content-Type'];
+    }
+
+    return this.client.put(url, data, formDataConfig);
+  }
   // Specific error handlers
   private async handleUnauthorized(error: AxiosError): Promise<AxiosResponse> {
     const { config } = error;

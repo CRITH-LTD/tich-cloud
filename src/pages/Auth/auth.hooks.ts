@@ -63,38 +63,43 @@ export const useAuthForm = ({ intent }: UseAuthFormProps) => {
         }
     };
 
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
-        setIsSubmitting(true)
-
-        // Password match check for signup
-        if (intent === "signup" && formData.password !== formData.confirmPassword) {
-            setPasswordMismatch(true);
-            toast.error("Passwords do not match", { autoClose: 3000 });
-            return;
-        }
-
-        setPasswordMismatch(false);
-
-        // Prepare payload based on auth intent
-        let payload: Partial<AuthFormData> = {
-            email: formData.email,
-            password: formData.password,
-        };
-
-        if (intent === "signup") {
-            const {
-                confirmPassword,
-                agreeToTerms,
-                // subscribeToUpdates,
-                ...rest
-            } = formData;
-            console.log("There are " + confirmPassword?.length + " Good Ideas Today and they are " + agreeToTerms );
-            payload = { ...rest }; // remove confirmPassword, agreeToTerms, subscribeToUpdates
-        }
+        setIsSubmitting(true);
 
         try {
+            // Password match check
+            if (intent === "signup" && formData.password !== formData.confirmPassword) {
+                setPasswordMismatch(true);
+                toast.error("Passwords do not match", { autoClose: 3000 });
+                return;
+            }
+
+            setPasswordMismatch(false);
+
+            // Construct request payload
+            let payload: Partial<AuthFormData> = {
+                email: formData.email,
+                password: formData.password,
+            };
+
+            if (intent === "signup") {
+                const {
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    confirmPassword,
+                    agreeToTerms,
+                    ...rest
+                } = formData;
+
+                if (!agreeToTerms) {
+                    toast.error("You must agree to the terms and conditions.", { autoClose: 3000 });
+                    return;
+                }
+
+                payload = { ...rest };
+            }
+
             const endpoint = intent === "signup" ? "/auth/root/create" : "/auth/root/login";
             const res = await api.post(endpoint, payload);
 
@@ -102,14 +107,13 @@ export const useAuthForm = ({ intent }: UseAuthFormProps) => {
                 const token = res.data.access_token;
                 dispatch(setCredentials({ accessToken: token }));
 
-                // Fetch current user profile
                 try {
                     const meRes = await api.get("/users/me", {
                         headers: { Authorization: `Bearer ${token}` },
                     });
 
                     if (meRes?.data) {
-                        dispatch(setUser(meRes.data)); // Define setUser in your authSlice
+                        dispatch(setUser(meRes.data));
                     }
                 } catch (meErr) {
                     console.error("Failed to fetch user:", meErr);
@@ -119,40 +123,17 @@ export const useAuthForm = ({ intent }: UseAuthFormProps) => {
                 toast.success("Authenticated successfully!", { autoClose: 2000 });
                 navigate(pathnames.DASHBOARD);
             } else {
-                console.log("Unexpected response:", res);
                 toast.error("Unexpected response. Please try again.", { autoClose: 3000 });
-                toast.error(res.toString(), { autoClose: 3000 });
+                console.error("Unexpected response:", res);
             }
 
-        } catch (error: unknown) {
-            const fallbackMessage = "Something went wrong. Please try again.";
-
-            interface AxiosErrorLike {
-                response?: {
-                    data?: {
-                        message?: string;
-                    };
-                };
-            }
-
-            const isAxiosError = (error: unknown): error is AxiosErrorLike =>
-                typeof error === "object" &&
-                error !== null &&
-                "response" in error &&
-                (error as AxiosErrorLike).response !== undefined &&
-                typeof (error as AxiosErrorLike).response?.data?.message === "string";
-
-            const message = isAxiosError(error)
-                ? error.response?.data?.message ?? fallbackMessage
-                : fallbackMessage;
-
-            toast.error(message, { autoClose: 4000 });
-        }
-
-        finally {
+        } catch (err) {
+            console.error("Submit error:", err);
+        } finally {
             setIsSubmitting(false);
         }
     };
+
 
 
     const handleLogout = () => {

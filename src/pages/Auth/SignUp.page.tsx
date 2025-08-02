@@ -2,12 +2,14 @@ import { Link } from 'react-router-dom';
 import { Cloud, Check, Building2, Users, GraduationCap, Shield, Globe, Zap, Eye, EyeOff } from 'lucide-react';
 import { pathnames } from '../../routes/path-names';
 import { useAuthForm } from './auth.hooks';
+import LoadingSpinner from '../Dashboard/UMSCreationSteps/UMSSettings/components/LoadingSpinner';
 
 const SignUp = () => {
   const {
     formData,
     handleInputChange,
     handleSubmit,
+    isSubmitting,
     showPassword,
     showConfirmPassword,
     togglePasswordVisibility,
@@ -190,13 +192,13 @@ const SignUp = () => {
                         >
                           {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </button>
-                        
+
                       </div>
                     </div>
                   </div>
                   {passwordMismatch && (
-                          <p className="text-sm text-red-600 mt-2">Passwords do not match</p>
-                        )}
+                    <p className="text-sm text-red-600 mt-2">Passwords do not match</p>
+                  )}
                 </div>
 
 
@@ -240,13 +242,37 @@ const SignUp = () => {
                 <button
                   type="submit"
                   onMouseEnter={checkPasswordMatch}
-                  className={`w-full py-3 px-4 rounded-md font-medium transition-all duration-200 ${passwordMismatch
-                    ? "bg-red-600 text-white hover:bg-red-700"
-                    : "bg-blue-600 text-white hover:bg-blue-700"
-                    }`}
+                  disabled={
+                    !formData.firstName ||
+                    !formData.lastName ||
+                    !formData.email ||
+                    !formData.password ||
+                    !formData.confirmPassword ||
+                    !formData.phone ||
+                    !formData.agreeToTerms ||
+                    isSubmitting ||
+                    formData.password !== formData.confirmPassword
+                  }
+                  className={`w-full py-3 px-4 rounded-md font-medium transition-all duration-200 flex items-center justify-center gap-2
+    ${formData.password !== formData.confirmPassword
+                      ? "bg-red-600 hover:bg-red-700 text-white"
+                      : "bg-blue-600 hover:bg-blue-700 text-white"
+                    }
+    disabled:bg-blue-200 disabled:text-white disabled:cursor-not-allowed`}
                 >
-                  {passwordMismatch ? "Passwords do not match" : "Create TICH account"}
+                  {isSubmitting ? (
+                    <>
+                      <LoadingSpinner size="sm" />
+                      Creating your account
+                    </>
+                  ) : formData.password !== formData.confirmPassword ? (
+                    "Passwords do not match"
+                  ) : (
+                    "Create TICH account"
+                  )}
                 </button>
+
+
 
               </form>
 

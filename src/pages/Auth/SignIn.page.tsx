@@ -3,12 +3,14 @@ import { Link } from 'react-router-dom';
 import { Cloud, Eye, EyeOff, ArrowLeft, Shield, Globe, Users } from 'lucide-react';
 import { useAuthForm } from './auth.hooks';
 import { Logo } from '../../components/Common/Logo';
+import LoadingSpinner from '../Dashboard/UMSCreationSteps/UMSSettings/components/LoadingSpinner';
 
 const SignIn = () => {
   const {
     formData,
     handleInputChange,
     handleSubmit,
+    isSubmitting,
     showPassword,
     togglePasswordVisibility,
   } = useAuthForm({ intent: "signin" });
@@ -108,6 +110,7 @@ const SignIn = () => {
                 name="email"
                 type="email"
                 autoComplete="email"
+                disabled={isSubmitting}
                 required
                 value={formData.email}
                 onChange={handleInputChange}
@@ -126,6 +129,7 @@ const SignIn = () => {
                   name="password"
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
+                  disabled={isSubmitting}
                   required
                   value={formData.password}
                   onChange={handleInputChange}
@@ -148,6 +152,7 @@ const SignIn = () => {
                   id="remember-me"
                   name="remember-me"
                   type="checkbox"
+                  disabled={isSubmitting}
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
@@ -164,11 +169,22 @@ const SignIn = () => {
 
             <button
               type="submit"
-              disabled={!formData.email || !formData.password}
-              className={`w-full ${!formData.email || !formData.password ? "bg-blue-200 hover:bg-blue-100" : "bg-blue-600 hover:bg-blue-700"} text-white py-3 px-4 rounded-lg  focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 font-medium`}
+              disabled={!formData.email || !formData.password || isSubmitting}
+              className={`w-full ${!formData.email || !formData.password || isSubmitting
+                  ? "bg-blue-200 hover:bg-blue-100 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700"
+                } text-white py-3 px-4 rounded-lg focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 font-medium flex items-center justify-center gap-2`}
             >
-              Sign in to Console
+              {isSubmitting ? (
+                <>
+                  <LoadingSpinner size="sm" />
+                  Signing in...
+                </>
+              ) : (
+                <>Sign in to Console</>
+              )}
             </button>
+
           </form>
 
           <div className="mt-8 pt-6 border-t border-gray-200">

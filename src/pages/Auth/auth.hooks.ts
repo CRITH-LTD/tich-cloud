@@ -31,6 +31,8 @@ export const useAuthForm = ({ intent }: UseAuthFormProps) => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [passwordMismatch, setPasswordMismatch] = useState(false);
 
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const [formData, setFormData] = useState<AuthFormData>({
         email: "",
         password: "",
@@ -63,6 +65,8 @@ export const useAuthForm = ({ intent }: UseAuthFormProps) => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        setIsSubmitting(true)
 
         // Password match check for signup
         if (intent === "signup" && formData.password !== formData.confirmPassword) {
@@ -144,6 +148,10 @@ export const useAuthForm = ({ intent }: UseAuthFormProps) => {
 
             toast.error(message, { autoClose: 4000 });
         }
+
+        finally {
+            setIsSubmitting(false);
+        }
     };
 
 
@@ -162,6 +170,7 @@ export const useAuthForm = ({ intent }: UseAuthFormProps) => {
         passwordMismatch,
         handleInputChange,
         handleSubmit,
+        isSubmitting,
         handleLogout,
         togglePasswordVisibility,
         toggleConfirmPasswordVisibility,

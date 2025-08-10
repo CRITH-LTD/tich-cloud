@@ -1,4 +1,5 @@
 import { LucideIcon } from 'lucide-react';
+import { Department } from './department.types';
 
 export interface Permission {
   id: string;
@@ -22,13 +23,6 @@ export interface Role {
   users: User[];
 }
 
-export interface Department {
-  id?: string;
-  name: string;
-  description?: string;
-  headOfDepartment?: string;
-  established?: Date;
-}
 
 export interface PlatformAccess {
   teacherApp: boolean;

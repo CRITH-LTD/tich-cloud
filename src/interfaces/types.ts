@@ -1,3 +1,4 @@
+import { LucideIcon } from 'lucide-react';
 import { AuthState } from '../features/auth/authSlice';
 import { UMSCreationState } from '../features/UMS/UMSCreationSlice';
 import { Department } from '../types/ums-settings.types';
@@ -13,17 +14,51 @@ export interface RootState {
   umsCreation: UMSCreationState;
 }
 
+export interface testUMSForm {
+  umsLogo: string;
+  umsPhoto: string;
+  umsName: string;
+  umsTagline: string;
+  umsDescription: string;
+  umsWebsite: string;
+  umsSize: string;
+  umsType: "University" | "College" | "School" | undefined;
+  adminName: string;
+  adminEmail: string;
+  adminPhone: string;
+  enable2FA: boolean;
+  modules: string[];
+  platforms: {
+    teacherApp: boolean;
+    studentApp: boolean;
+    desktopOffices: string[];
+  };
+  roles: Role[];
+  departments: Department[];
+}
+export interface SaveState {
+  isLoading: boolean;
+  error: string | null;
+  hasUnsavedChanges: boolean;
+}
+
+export interface Tab {
+  id: string;
+  label: string;
+  icon: LucideIcon;
+}
+
 export interface UMSUpdateResponse {
-    data: UMS; // Your UMS type
-    message: string;
-    success: boolean;
+  data: UMS; // Your UMS type
+  message: string;
+  success: boolean;
 }
 
 // Define error response type
 export interface ApiErrorResponse {
-    message?: string | { message: string };
-    error?: string;
-    statusCode?: number;
+  message?: string | { message: string };
+  error?: string;
+  statusCode?: number;
 }
 export type PermissionsRoles = {
   id: string;
@@ -65,7 +100,7 @@ export type UMSForm = {
   umsWebsite?: string;
   umsType?: 'University' | 'College' | 'School';
   umsSize?: string;
-  
+
   // --- File Uploads (can be a File object or an existing URL string) ---
   umsLogo?: string;
   umsPhoto?: string;

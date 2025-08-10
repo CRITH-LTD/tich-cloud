@@ -4,7 +4,7 @@ import { UMSForm } from '../../../../../interfaces/types';
 
 interface GeneralSettingsProps {
   formData: UMSForm;
-  onInputChange: (field: string, value: any) => void;
+  onInputChange: <K extends keyof UMSForm>(field: K, value: UMSForm[K]) => void;
   // updateField: <K extends keyof UMSForm>(field: K, value: UMSForm[K]) => void;
 }
 

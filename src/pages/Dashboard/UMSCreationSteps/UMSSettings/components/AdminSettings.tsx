@@ -3,7 +3,7 @@ import { Card, FormInput } from "./common";
 
 interface AdminSettingsProps {
   formData: UMSForm;
-  onInputChange: (field: string, value: any) => void;
+  onInputChange: <K extends keyof UMSForm>(field: K, value: UMSForm[K]) => void;
 }
 
 const AdminSettings: React.FC<AdminSettingsProps> = ({

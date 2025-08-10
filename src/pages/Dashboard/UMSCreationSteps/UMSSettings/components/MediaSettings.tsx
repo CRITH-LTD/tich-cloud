@@ -28,8 +28,6 @@ const MediaSettings: React.FC<MediaSettingsProps> = ({
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [modalType, setModalType] = React.useState<'logo' | 'photo' | null>(null);
 
-  console.log('preview urls', logoPreviewUrl)
-
   const handleOpenModal = (type: 'logo' | 'photo') => {
     setModalType(type);
     setIsModalOpen(true);
@@ -52,7 +50,6 @@ const MediaSettings: React.FC<MediaSettingsProps> = ({
   // Helper function to determine which image to show
   const getDisplayImage = (previewUrl?: string, savedUrl?: string) => {
     // If we have a preview URL (user just selected a file), show that
-      console.log('preview url in', previewUrl)
     if (previewUrl) return previewUrl;
     // Otherwise, show the saved URL if it exists
     return savedUrl;

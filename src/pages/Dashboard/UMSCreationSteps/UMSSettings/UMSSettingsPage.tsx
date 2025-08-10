@@ -23,32 +23,37 @@ import { XCircle } from "lucide-react";
 import { Role } from "../../../../interfaces/types";
 
 const UMSSettingsPage: React.FC = () => {
-    const { isLoading, error } = useUMSDetail();
+    const { error, ums } = useUMSDetail();
 
     const {
+        // id,
+        currentUMS,
+        formData,
+
+        // UI state
         activeTab,
         setActiveTab,
         // showPassword,
         // setShowPassword,
-        unsavedChanges,
         tabs,
-        formData,
-        currentUMS: ums,
-        handleSave,
-        isUpdating,
-        savingError,
-        handleInputChange
-    } = useUMSSettings();
 
-    const {
-        addRole,
-        updateRole,
-        removeRole,
-        // updateField,
-        addUserToRole,
-        updateUserInRole,
-        removeUserFromRole
-    } = useCreateUMS();
+        // Save state
+        isLoading,
+        hasUnsavedChanges,
+        savingError,
+
+        // Handlers
+        handleInputChange,
+        handleSave,
+        handleReset,
+        handleRoleUpdate,
+        handleRoleAdd,
+        handleRoleRemove,
+
+        // Loading states
+        isLoadingUMS,
+        isReady
+    } = useUMSSettings();
 
     const { getAllPermissions } = usePermissions();
     const allPermissions = getAllPermissions();
@@ -76,10 +81,14 @@ const UMSSettingsPage: React.FC = () => {
         setRoleSubmissionLoading(true);
 
         try {
+            console.log("Processing role submission");
+
             if (index !== undefined) {
-                await updateRole(index, role);
+                console.log("Updating existing role at index:", index);
+                await handleRoleUpdate(index, role);
             } else {
-                await addRole(role);
+                console.log("Adding new role");
+                await handleRoleAdd(role);
             }
 
             // Close drawer after successful submission
@@ -93,7 +102,8 @@ const UMSSettingsPage: React.FC = () => {
         }
     };
 
-    if (isLoading) {
+    // Show loading spinner while data is being fetched
+    if (isLoadingUMS || !isReady) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50">
                 <LoadingSpinner size="lg" />
@@ -101,7 +111,8 @@ const UMSSettingsPage: React.FC = () => {
         );
     }
 
-    if (error || !ums) {
+    // Show error if there's an issue loading data
+    if (error || !currentUMS) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50">
                 <ErrorMessage
@@ -120,7 +131,6 @@ const UMSSettingsPage: React.FC = () => {
                     <GeneralSettings
                         formData={formData}
                         onInputChange={handleInputChange}
-                        // updateField={updateField}
                     />
                 );
             case "admin":
@@ -135,8 +145,8 @@ const UMSSettingsPage: React.FC = () => {
                     <SecuritySettings
                         formData={formData}
                         onInputChange={handleInputChange}
-                    // showPassword={showPassword}
-                    // onTogglePassword={() => setShowPassword(!showPassword)}
+                        // showPassword={showPassword}
+                        // onTogglePassword={() => setShowPassword(!showPassword)}
                     />
                 );
             case "modules":
@@ -152,16 +162,25 @@ const UMSSettingsPage: React.FC = () => {
                         formData={formData}
                         onAddRole={() => openRoleDrawer()}
                         onEditRole={(i) => openRoleDrawer(formData.roles[i], i)}
-                        onDeleteRole={(i) => removeRole(i)}
+                        onDeleteRole={(i) => handleRoleRemove(i)}
                     />
                 );
             case "departments":
                 return (
                     <DepartmentsSettings
                         formData={formData}
-                        onAddDepartment={() => { }}
-                        onEditDepartment={() => { }}
-                        onDeleteDepartment={() => { }}
+                        onAddDepartment={() => { 
+                            // TODO: Implement department functionality
+                            console.log("Add department functionality not implemented yet");
+                        }}
+                        onEditDepartment={() => { 
+                            // TODO: Implement department functionality
+                            console.log("Edit department functionality not implemented yet");
+                        }}
+                        onDeleteDepartment={() => { 
+                            // TODO: Implement department functionality
+                            console.log("Delete department functionality not implemented yet");
+                        }}
                     />
                 );
             case "danger":
@@ -175,14 +194,15 @@ const UMSSettingsPage: React.FC = () => {
         <>
             <Breadcrumbs />
             <SettingsLayout
-                isUpdating={isUpdating}
+                isUpdating={isLoading} // Fixed: use isLoading from hook
                 savingError={savingError}
-                umsName={ums.umsName}
+                umsName={currentUMS?.umsName || ums?.umsName || 'UMS'} // Fixed: use available UMS name
                 tabs={tabs}
                 activeTab={activeTab}
                 onTabChange={setActiveTab}
-                unsavedChanges={unsavedChanges}
+                unsavedChanges={hasUnsavedChanges} // Fixed: use hasUnsavedChanges from hook
                 onSave={handleSave}
+                onReset={handleReset} // Added reset functionality
             >
                 {renderTabContent()}
             </SettingsLayout>

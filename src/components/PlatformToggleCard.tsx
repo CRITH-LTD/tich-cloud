@@ -155,7 +155,7 @@ const MainPlatformToggle = ({
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {desktopOfficeOptions.map((office) => (
+                    {desktopOfficeOptions?.map((office) => (
                         <OfficeOptionCard
                             key={office}
                             office={office}
@@ -168,7 +168,7 @@ const MainPlatformToggle = ({
                                             ? "Exam scheduling and academic assessments"
                                             : "Undergraduate registration and records"
                             }
-                            checked={form.platforms.desktopOffices.includes(office)}
+                            checked={form.platforms.desktopOffices ? form.platforms.desktopOffices.includes(office) : false}
                             onChange={() => toggleOffice(office)}
                         />
                     ))}

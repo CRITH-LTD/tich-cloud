@@ -79,11 +79,12 @@ const RoleDrawer: React.FC<RoleDrawerProps> = ({
         }
     }, [isOpen]);
 
-    const handleSave = async () => {
+    const handleSave = () => {
         if (!validate()) return;
 
         try {
-            await onSubmit(form, roleIndex);
+            console.log("here first")
+            onSubmit(form, roleIndex);
             onClose();
         } catch (error) {
             setErrors({ general: "Failed to save role. Please try again." });

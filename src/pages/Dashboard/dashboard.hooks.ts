@@ -1,16 +1,7 @@
 import { RootState, AppDispatch } from "../../store";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAuthForm } from "../Auth/auth.hooks";
 import { useDispatch, useSelector } from 'react-redux';
-import {
-    Settings,
-    Shield,
-    Key,
-    AlertTriangle,
-    Crown,
-    Database,
-    School2Icon
-} from "lucide-react";
 import {
     nextStep,
     prevStep,
@@ -27,7 +18,7 @@ import {
     updateUserInRole as handleUpdateUserInRole,
     removeUserFromRole as handleRemoveUserFromRole,
 } from '../../features/UMS/UMSCreationSlice'; // Adjust the path to your slice file
-import { ApiErrorResponse, errorTypeAPI, PermissionsData, Role, RoleUser, UMS, UMSForm, UMSUpdateResponse } from "../../interfaces/types";
+import { ApiErrorResponse, errorTypeAPI, PermissionsData, Role, RoleUser, SaveState, testUMSForm, UMS, UMSForm, UMSUpdateResponse } from "../../interfaces/types";
 import api from "../../config/axios";
 import { toast } from "react-toastify";
 import {
@@ -41,27 +32,98 @@ import {
 } from '../../features/UMS/UMSManagementSlice';
 import { useNavigate, useParams } from "react-router";
 import UserInterface from "../../interfaces/user.interface";
+import { TABS } from "../../constants/constants";
+import { createFormPayload } from "../../utils";
 
 export const useUMSSettings = () => {
     const { id } = useParams<{ id: string }>();
+    const dispatch = useDispatch();
     const { fetchUMS, ums } = useUMSDetail();
 
-    const [activeTab, setActiveTab] = useState('general');
-    const [showPassword, setShowPassword] = useState(false);
-    const [unsavedChanges, setUnsavedChanges] = useState(false);
-    const [isUpdating, setIsUpdating] = useState(false);
-    const [savingError, setSavingError] = useState<string | null>(null);
-    const [formData, setFormData] = useState<UMSForm>({});
-
-    const dispatch = useDispatch();
+    // Selectors
     const currentUMS = useSelector((state: RootState) => state.umsManagement.currentUMS);
+    const isLoadingUMS = useSelector((state: RootState) => state.umsManagement.loading);
 
-    // Fetch from backend only once and update global state
+    // Local state
+    const [activeTab, setActiveTab] = useState<string>('general');
+    const [showPassword, setShowPassword] = useState<boolean>(false);
+    const [formData, setFormData] = useState<UMSForm>({
+        umsLogo: '',
+        umsPhoto: '',
+        umsName: '',
+        umsTagline: '',
+        umsDescription: '',
+        umsWebsite: '',
+        umsSize: '',
+        umsType: undefined,
+        adminName: '',
+        adminEmail: '',
+        adminPhone: '',
+        enable2FA: false,
+        modules: [],
+        platforms: { teacherApp: false, studentApp: false, desktopOffices: [] },
+        roles: [],
+        departments: []
+    });
+    const [saveState, setSaveState] = useState<SaveState>({
+        isLoading: false,
+        error: null,
+        hasUnsavedChanges: false
+    });
+
+    // Memoized initial form data
+    const initialFormData = useMemo((): UMSForm => {
+        if (!currentUMS) {
+            return {
+                umsLogo: '',
+                umsPhoto: '',
+                umsName: '',
+                umsTagline: '',
+                umsDescription: '',
+                umsWebsite: '',
+                umsSize: '',
+                umsType: undefined,
+                adminName: '',
+                adminEmail: '',
+                adminPhone: '',
+                enable2FA: false,
+                modules: [],
+                platforms: {
+                    teacherApp: false,
+                    studentApp: false,
+                    desktopOffices: [],
+                },
+                roles: [],
+                departments: []
+            };
+        }
+
+        return {
+            umsLogo: currentUMS.umsLogoUrl || '',
+            umsPhoto: currentUMS.umsPhotoUrl || '',
+            umsName: currentUMS.umsName || '',
+            umsTagline: currentUMS.umsTagline || '',
+            umsDescription: currentUMS.umsDescription || '',
+            umsWebsite: currentUMS.umsWebsite || '',
+            umsSize: currentUMS.umsSize || '',
+            umsType: currentUMS.umsType || undefined,
+            adminName: currentUMS.adminName || '',
+            adminEmail: currentUMS.adminEmail || '',
+            adminPhone: currentUMS.adminPhone || '',
+            enable2FA: currentUMS.enable2FA || false,
+            modules: currentUMS.modules || [],
+            platforms: currentUMS.platforms || {},
+            roles: currentUMS.roles || [],
+            departments: currentUMS.departments || []
+        };
+    }, [currentUMS]);
+
+    // Fetch UMS data on mount
     useEffect(() => {
         if (id && !currentUMS) {
             fetchUMS(id);
         }
-    }, [fetchUMS, id, currentUMS]);
+    }, [id, currentUMS, fetchUMS]);
 
     // Update global state when we get data from backend
     useEffect(() => {
@@ -70,225 +132,147 @@ export const useUMSSettings = () => {
         }
     }, [dispatch, ums, currentUMS]);
 
-    // Initialize form data from global state
+    // Initialize form data when UMS data is available
     useEffect(() => {
-        if (currentUMS) {
-            setFormData({
-                umsLogo: currentUMS.umsLogoUrl || '',
-                umsPhoto: currentUMS.umsPhotoUrl || '',
-                umsName: currentUMS.umsName || '',
-                umsTagline: currentUMS.umsTagline || '',
-                umsDescription: currentUMS.umsDescription || '',
-                umsWebsite: currentUMS.umsWebsite || '',
-                umsSize: currentUMS.umsSize || '',
-                umsType: currentUMS.umsType || undefined,
-                adminName: currentUMS.adminName || '',
-                adminEmail: currentUMS.adminEmail || '',
-                adminPhone: currentUMS.adminPhone || '',
-                enable2FA: currentUMS.enable2FA || false,
-                // defaultPassword: 'password123', // This would come from API
-                modules: currentUMS.modules || [],
-                platforms: currentUMS.platforms || {},
-                roles: currentUMS.roles || [],
-                departments: currentUMS.departments || []
-            });
+        if (currentUMS && Object.keys(initialFormData).length > 0) {
+            setFormData(initialFormData);
+            setSaveState(prev => ({ ...prev, hasUnsavedChanges: false }));
         }
-    }, [currentUMS]);
+    }, [initialFormData, currentUMS]);
 
-    const handleInputChange = <K extends keyof UMSForm>(field: K, value: UMSForm[K]) => {
-        console.log("in handle Input in Hooks", { field, value })
+    // Optimized input change handler
+    const handleInputChange = useCallback(<K extends keyof UMSForm>(
+        field: K,
+        value: UMSForm[K]
+    ) => {
         setFormData(prev => ({ ...prev, [field]: value }));
-        dispatch(handleUpdateField({ field, value }))
-        console.log("formdata in hooks", formData)
-        setUnsavedChanges(true);
-    };
+        setSaveState(prev => ({ ...prev, hasUnsavedChanges: true, error: null }));
 
-    // const updateField = <K extends keyof UMSForm>(field: K, value: UMSForm[K]) => {
-    //     console.log("field", {field, value})
-    //     dispatch(handleUpdateField({ field, value }));
-    // };
+        // Update global state for immediate UI feedback using your existing action
+        dispatch(handleUpdateField({ field, value }));
+    }, [dispatch]);
 
-    // Fix 4: Add role-specific update functions that also update global state
-    const updateFormDataRoles = (newRoles: Role[]) => {
-        setFormData(prev => ({ ...prev, roles: newRoles }));
-        setUnsavedChanges(true);
+    // Role management handlers - Fixed to use your existing actions
+    const handleRoleUpdate = useCallback((index: number, role: Role) => {
+        setFormData(prev => {
+            const updatedRoles = [...prev.roles || []];
+            updatedRoles[index] = role;
+            return { ...prev, roles: updatedRoles };
+        });
 
-        // Also update global state to keep it in sync
-        if (currentUMS) {
-            dispatch(setCurrentUMS({ ...currentUMS, roles: newRoles }));
-        }
-    };
+        // Use your existing action pattern
+        dispatch(handleUpdateField({
+            field: 'roles',
+            value: formData.roles?.map((r, i) => i === index ? role : r) || []
+        }));
+        setSaveState(prev => ({ ...prev, hasUnsavedChanges: true }));
+    }, [dispatch, formData.roles]);
 
-    const getFormDataForUpdate = (currentData: any, originalData: any) => {
-        const payload = new FormData();
-        let hasChanges = false;
+    const handleRoleAdd = useCallback((role: Partial<Role> = { name: "", users: [] }) => {
+        const newRole = { ...role } as Role;
 
-        // Iterate over the current form data
-        for (const key in currentData) {
-            // Skip keys that are not part of the update payload (e.g., internal component state)
-            if (key === 'id' || key === '_id') {
-                continue;
-            }
+        setFormData(prev => ({
+            ...prev,
+            roles: [...(prev.roles || []), newRole]
+        }));
 
-            const currentValue = currentData[key];
-            const originalValue = originalData[key];
+        // Use your existing action
+        dispatch(handleAddRole(newRole));
+        setSaveState(prev => ({ ...prev, hasUnsavedChanges: true }));
+    }, [dispatch]);
 
-            // --- Logic to detect changes ---
-            if (
-                // Always include files, as they are considered new changes
-                currentValue instanceof File ||
-                // Check for a change in value for primitive types
-                (typeof currentValue !== 'object' && currentValue !== originalValue) ||
-                // Check for changes in objects and arrays by stringifying them
-                (typeof currentValue === 'object' && JSON.stringify(currentValue) !== JSON.stringify(originalValue))
-            ) {
-                hasChanges = true;
-                // Append the changed field to the FormData payload
-                if (currentValue instanceof File) {
-                    payload.append(key, currentValue);
-                } else if (typeof currentValue === 'object') {
-                    payload.append(key, JSON.stringify(currentValue));
-                } else {
-                    payload.append(key, currentValue);
-                }
-            }
-        }
+    const handleRoleRemove = useCallback((index: number) => {
+        setFormData(prev => {
+            const updatedRoles = (prev.roles || []).filter((_, i) => i !== index);
+            return { ...prev, roles: updatedRoles };
+        });
 
-        return hasChanges ? payload : null;
-    };
+        // Use your existing action
+        dispatch(handleRemoveRole(index));
+        setSaveState(prev => ({ ...prev, hasUnsavedChanges: true }));
+    }, [dispatch]);
 
-
-    const handleSave = async () => {
-        // --- 1. Guard against unnecessary or duplicate calls ---
-        if (!unsavedChanges || isUpdating || !currentUMS) {
+    // the save handler
+    const handleSave = useCallback(async () => {
+        if (!saveState.hasUnsavedChanges || saveState.isLoading || !currentUMS || !id) {
             return;
         }
 
-        // --- 2. Manage loading and error states ---
-        setIsUpdating(true);
-        setSavingError(null);
+        setSaveState(prev => ({ ...prev, isLoading: true, error: null }));
 
         try {
-            // --- 3. Utility function to convert URL to File ---
-            const urlToFile = async (url: string, fileName: string): Promise<File> => {
-                const res = await fetch(url);
-                const blob = await res.blob();
-                return new File([blob], fileName, { type: blob.type });
-            };
+            const payload = await createFormPayload(formData, currentUMS);
 
-            // --- 4. Get the payload with only the changed fields ---
-            let payload = getFormDataForUpdate(formData, currentUMS);
-
-            // If there are no actual changes, exit early
             if (!payload) {
-                console.log('No changes detected. Skipping API call.');
                 toast.info('No changes to save.', { autoClose: 2000 });
-                setUnsavedChanges(false);
+                setSaveState(prev => ({ ...prev, hasUnsavedChanges: false, isLoading: false }));
                 return;
             }
 
-            // --- 5. Handle file conversions if payload is FormData ---
-            if (payload instanceof FormData) {
-                // Create a new FormData to rebuild with proper files
-                const enhancedPayload = new FormData();
+            const response = await api.patchFormData<UMSUpdateResponse>(`/ums/${id}`, payload);
+            const updatedUMS = response.data.data || response.data;
 
-                // Copy all existing entries
-                for (const [key, value] of payload.entries()) {
-                    if (key === 'umsLogo' || key === 'umsPhoto') {
-                        // If the value is a URL string, convert it to a File
-                        if (typeof value === 'string' && (value.startsWith('data:') || value.startsWith('blob:') || value.startsWith('http'))) {
-                            try {
-                                const fileName = key === 'umsLogo' ? 'ums-logo.png' : 'ums-photo.png';
-                                const file = await urlToFile(value, fileName);
-                                enhancedPayload.append(key, file);
-                                console.log(`Converted ${key} URL to File:`, file);
-                            } catch (error) {
-                                console.warn(`Failed to convert ${key} URL to File:`, error);
-                                // Fallback: append as string (backend should handle this)
-                                enhancedPayload.append(key, value);
-                            }
-                        } else {
-                            // Already a File or other valid value
-                            enhancedPayload.append(key, value);
-                        }
-                    } else {
-                        // Non-file fields
-                        enhancedPayload.append(key, value);
-                    }
-                }
-
-                payload = enhancedPayload;
-            }
-
-            // --- 6. Make the API call with proper typing ---
-            const response = payload instanceof FormData
-                ? await api.patchFormData<UMSUpdateResponse>(`/ums/${currentUMS.id}`, payload)
-                : await api.patch<UMSUpdateResponse>(`/ums/${currentUMS.id}`, payload);
-
-            // --- 7. Handle a successful response ---
-            const updatedUms = response.data.data || response.data; // Handle both response formats
-            console.log('Successfully saved changes:', updatedUms);
-            dispatch(setCurrentUMS(updatedUms));
-            setUnsavedChanges(false);
+            dispatch(setCurrentUMS(updatedUMS));
+            setSaveState({ isLoading: false, error: null, hasUnsavedChanges: false });
             toast.success('Changes saved successfully!', { autoClose: 2000 });
 
-        } catch (err: any) {
-            console.error('Failed to save changes:', err);
+        } catch (error: any) {
+            console.error('Failed to save UMS settings:', error);
 
-            // --- 8. Enhanced error handling ---
             let errorMessage = 'An unexpected error occurred.';
 
-            if (err?.response?.data) {
-                const errorData = err.response.data as ApiErrorResponse;
-
-                if (typeof errorData.message === 'object' && errorData.message?.message) {
-                    errorMessage = errorData.message.message;
-                } else if (typeof errorData.message === 'string') {
-                    errorMessage = errorData.message;
-                } else if (errorData.error) {
-                    errorMessage = errorData.error;
-                }
-            } else if (err?.message) {
-                errorMessage = err.message;
+            if (error?.response?.data) {
+                const errorData = error.response.data;
+                errorMessage = errorData.message?.message || errorData.message || errorData.error || errorMessage;
+            } else if (error?.message) {
+                errorMessage = error.message;
             }
 
-            setSavingError(errorMessage);
+            setSaveState(prev => ({ ...prev, isLoading: false, error: errorMessage }));
             toast.error(`Failed to save changes: ${errorMessage}`, { autoClose: 4000 });
-
-        } finally {
-            setIsUpdating(false);
         }
-    };
+    }, [formData, currentUMS, saveState.hasUnsavedChanges, saveState.isLoading, id, dispatch]);
 
-    const tabs = [
-        { id: 'general', label: 'General', icon: Settings },
-        { id: 'admin', label: 'Admin', icon: Crown },
-        { id: 'security', label: 'Security', icon: Shield },
-        { id: 'roles', label: 'Roles & Permissions', icon: Key },
-        { id: 'departments', label: 'Departments', icon: School2Icon },
-        { id: 'modules', label: 'Modules & Platforms', icon: Database },
-        { id: 'danger', label: 'Danger Zone', icon: AlertTriangle }
-    ];
+    // Reset form to original state
+    const handleReset = useCallback(() => {
+        if (currentUMS) {
+            setFormData(initialFormData);
+            setSaveState(prev => ({ ...prev, hasUnsavedChanges: false, error: null }));
+            toast.info('Changes reset to original values.', { autoClose: 2000 });
+        }
+    }, [initialFormData, currentUMS]);
 
     return {
+        // Core data
         id,
+        currentUMS,
+        formData,
+
+        // UI state
         activeTab,
         setActiveTab,
         showPassword,
         setShowPassword,
-        unsavedChanges,
-        isUpdating,
-        savingError,
-        setUnsavedChanges,
-        formData,
-        setFormData,
-        updateFormDataRoles, // Fix 5: Add this helper function
-        tabs,
+        tabs: TABS,
+
+        // Save state
+        isLoading: saveState.isLoading,
+        hasUnsavedChanges: saveState.hasUnsavedChanges,
+        savingError: saveState.error,
+
+        // Handlers
         handleInputChange,
         handleSave,
-        currentUMS // Fix 6: Expose currentUMS for other components
-    }
-}
+        handleReset,
+        handleRoleUpdate,
+        handleRoleAdd,
+        handleRoleRemove,
+
+        // Loading states
+        isLoadingUMS,
+        isReady: !!currentUMS
+    };
+};
 
 
 export const useUMSDetail = () => {
@@ -428,6 +412,9 @@ export const useCreateUMS = () => {
     const { currentStep, formData } = useSelector((state: RootState) => state.umsCreation);
     const [isLaunching, setIsLaunching] = useState(false);
 
+
+    const { handleSave } = useUMSSettings()
+
     // Generic field updater
     const updateField = <K extends keyof UMSForm>(field: K, value: UMSForm[K]) => {
         dispatch(handleUpdateField({ field, value }));
@@ -449,13 +436,20 @@ export const useCreateUMS = () => {
     };
 
     // Role methods
-    const addRole = (role: Partial<Role> = { name: "", users: [] }) => {
+    const addRole = async (role: Partial<Role> = { name: "", users: [] }) => {
+        // First dispatch the role to state
+
         dispatch(handleAddRole(role));
+
+        // Then save the changes
+        await handleSave();
     };
 
-    const updateRole = (index: number, updatedRole: Partial<Role>) => {
-        console.log("Updating role at index:", index, "with data:", updatedRole);
+    const updateRole = async (index: number, updatedRole: Partial<Role>) => {
         dispatch(handleUpdateRole({ index, role: updatedRole }));
+
+        // Then save the changes
+        await handleSave();
     };
 
     const removeRole = (index: number) => {

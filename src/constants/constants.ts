@@ -5,7 +5,14 @@ import {
   BookOpen,
   Users,
   LucideIcon,
+  Crown,
+  Shield,
+  AlertTriangle,
+  Database,
+  Key,
+  School2Icon,
 } from 'lucide-react';
+import { Tab } from '../types/ums-settings.types';
 
 export const MODULE_TIERS = {
     "Student Information": {
@@ -596,3 +603,12 @@ export const templateSuggestions: MatriculeConfig[] = [
   }
 ];
 
+export const TABS: Tab[] = [
+  { id: 'general', label: 'General', icon: Settings },
+  { id: 'admin', label: 'Admin', icon: Crown },
+  { id: 'security', label: 'Security', icon: Shield },
+  { id: 'roles', label: 'Roles & Permissions', icon: Key },
+  { id: 'departments', label: 'Departments', icon: School2Icon },
+  { id: 'modules', label: 'Modules & Platforms', icon: Database },
+  { id: 'danger', label: 'Danger Zone', icon: AlertTriangle }
+];

@@ -81,7 +81,9 @@ export default function Error404() {
           <h2 className="text-2xl font-semibold text-gray-800 mb-2">Page Not Found</h2>
           <p className="text-gray-600 leading-relaxed">
             The page you're looking for doesn't exist or has been moved. 
-            This might happen due to a mistyped URL or an outdated link.
+            Chai!! <br />
+            Don't worry, it happens to the best of us.
+            {/* This might happen due to a mistyped URL or an outdated link. */}
           </p>
         </div>
 

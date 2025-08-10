@@ -347,7 +347,7 @@ export const usePermissions = () => {
             const response = await api.get('/permissions/grouped');
 
             // Assuming the response.data matches the PermissionsData structure
-            setPermissions(response.data || null);
+            setPermissions(response.data && Object.keys(response.data).length > 0 ? response.data as PermissionsData : null);
             // console.log('Permissions loaded:', response.data);
             setError(null);
         } catch (err: unknown) {
@@ -491,7 +491,11 @@ export const useCreateUMS = () => {
             // First, transform the array of 'Role' objects to the 'RoleToBack' type
             const rolesToBack = form.roles.map(role => {
                 // For each role, extract just the 'id' from the permissions array
-                const permissionIds = role.permissions.map(permission => permission.id);
+                const permissionIds = role.permissions.map(permission =>
+                    typeof permission === 'object' && permission !== null && 'id' in permission
+                        ? permission.id
+                        : permission
+                );
 
                 // Return a new object that matches the 'RoleToBack' structure
                 return {

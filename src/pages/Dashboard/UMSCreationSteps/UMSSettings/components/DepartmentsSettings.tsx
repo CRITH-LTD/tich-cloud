@@ -19,10 +19,10 @@ interface CreateDepartmentDto {
   description?: string;
 }
 
-interface UpdateDepartmentDto {
-  name?: string;
-  description?: string;
-}
+// interface UpdateDepartmentDto {
+//   name?: string;
+//   description?: string;
+// }
 
 interface DepartmentFormModalProps {
   isOpen: boolean;
@@ -234,8 +234,6 @@ const DepartmentsSettings: React.FC = () => {
     onDeleteDepartment,
     refreshDepartments,
   } = useDepartments();
-
-  console.log('Departments data:', deptData);
 
   // Always have an array to render with
   const departments: Department[] = Array.isArray(deptData) ? deptData : [];

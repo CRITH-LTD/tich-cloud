@@ -10,7 +10,7 @@ import SettingsHeader from '../SettingsHeader';
 import SettingsSidebar from '../SettingsSidebar';
 import MediaSettings from '../MediaSettings';
 import DangerZone from '../DangerZone';
-import PlatformAccessSettings from '../PlatformAccessSettings';
+import PlatformSettings from '../PlatformAccessSettings';
 import SecuritySettings from './../SecuritySettings';
 import AdminSettings from './../AdminSettings';
 import ModulesSettings from './../ModulesSettings';
@@ -21,4 +21,4 @@ import RoleDrawer from '../RoleDrawing/RoleDrawer';
 import GeneralSettings from './../GeneralSettings';
 import ErrorMessage from './../ErrorMessage';
 
-export { GeneralSettings, Button, Card, FormInput, FormSelect, ErrorMessage, FormTextarea, ToggleSwitch, LoadingSpinner, SettingsHeader, SettingsSidebar, MediaSettings, PlatformAccessSettings, SecuritySettings, AdminSettings, DangerZone, ModulesSettings, SettingsLayout, RolesSettings, DepartmentsSettings, RoleDrawer };
+export { GeneralSettings, Button, Card, FormInput, FormSelect, ErrorMessage, FormTextarea, ToggleSwitch, LoadingSpinner, SettingsHeader, SettingsSidebar, MediaSettings, PlatformSettings as PlatformAccessSettings, SecuritySettings, AdminSettings, DangerZone, ModulesSettings, SettingsLayout, RolesSettings, DepartmentsSettings, RoleDrawer };

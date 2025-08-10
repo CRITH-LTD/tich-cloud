@@ -83,8 +83,9 @@ const RoleDrawer: React.FC<RoleDrawerProps> = ({
         if (!validate()) return;
 
         try {
-            console.log("here first")
-            onSubmit(form, roleIndex);
+            console.log("here first", form, roleIndex);
+            // Call the onSubmit prop with the form data and index if editing
+            onSubmit({...form, permissions: form.permissions.map(perm => perm.id)}, roleIndex);
             onClose();
         } catch (error) {
             setErrors({ general: "Failed to save role. Please try again." });

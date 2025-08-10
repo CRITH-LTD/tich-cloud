@@ -1,7 +1,7 @@
 import { LucideIcon } from 'lucide-react';
 import { AuthState } from '../features/auth/authSlice';
 import { UMSCreationState } from '../features/UMS/UMSCreationSlice';
-import { Department } from '../types/ums-settings.types';
+import { Department } from '../types/department.types';
 
 export type RoleUser = {
   email: string;
@@ -75,7 +75,8 @@ export type RoleToBack = {
 export type Role = {
   name: string;
   description?: string;
-  permissions: PermissionsRoles[];
+  permissions: PermissionsRoles[] | string[]; // Can be either array of objects or array of permission IDs
+  id?: string; // Optional ID for existing roles
   users: RoleUser[];
 };
 

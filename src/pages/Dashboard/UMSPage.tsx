@@ -72,7 +72,7 @@ const UMSPage = () => {
     const uniqueTypes = [...new Set(umsList.map(ums => ums.umsType).filter((type): type is Exclude<typeof type, null> => !!type))];
 
     return (
-        <div className="p-6 mx-auto max-w-7xl">
+        <div className="p-6 mx-auto max-w-[85vw]">
             <Breadcrumbs />
 
             {/* Header Section */}

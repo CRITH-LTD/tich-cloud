@@ -46,7 +46,7 @@ const SettingsHeader: React.FC<SettingsHeaderProps> = ({
 
   return (
     <header className="bg-white/95 backdrop-blur-sm border-b sticky top-[4rem] w-full border-gray-200 shadow-sm z-10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[85vw] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-4">
           {/* Left Section - Title */}
           <div className="flex items-center space-x-3">

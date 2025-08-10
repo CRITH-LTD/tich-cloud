@@ -145,21 +145,19 @@ const UMSSettingsPage: React.FC = () => {
                     <SecuritySettings
                         formData={formData}
                         onInputChange={handleInputChange}
-                        // showPassword={showPassword}
-                        // onTogglePassword={() => setShowPassword(!showPassword)}
+                    // showPassword={showPassword}
+                    // onTogglePassword={() => setShowPassword(!showPassword)}
                     />
                 );
             case "modules":
                 return (
-                    <ModulesSettings
-                        formData={formData}
-                        onInputChange={handleInputChange}
-                    />
+                    <ModulesSettings />
                 );
             case "roles":
                 return (
                     <RolesSettings
                         formData={formData}
+                        allPermissions={allPermissions}
                         onAddRole={() => openRoleDrawer()}
                         onEditRole={(i) => openRoleDrawer(formData.roles[i], i)}
                         onDeleteRole={(i) => handleRoleRemove(i)}
@@ -167,21 +165,7 @@ const UMSSettingsPage: React.FC = () => {
                 );
             case "departments":
                 return (
-                    <DepartmentsSettings
-                        formData={formData}
-                        onAddDepartment={() => { 
-                            // TODO: Implement department functionality
-                            console.log("Add department functionality not implemented yet");
-                        }}
-                        onEditDepartment={() => { 
-                            // TODO: Implement department functionality
-                            console.log("Edit department functionality not implemented yet");
-                        }}
-                        onDeleteDepartment={() => { 
-                            // TODO: Implement department functionality
-                            console.log("Delete department functionality not implemented yet");
-                        }}
-                    />
+                    <DepartmentsSettings />
                 );
             case "danger":
                 return <DangerZone />;

@@ -29,7 +29,7 @@ export class DepartmentService {
                 DepartmentService.BASE_URL
             );
             console.log('Fetched departmentszs:', response.data);
-            return response.data;
+            return response.data as unknown as Department[];
         } catch (error) {
             console.error('Error fetching departments:', error);
             throw new Error('Failed to fetch departments. Please try again.');

@@ -100,33 +100,76 @@ export const useRoleForm = ({
     return newErrors;
   }, [form, existingRoles, mode, roleIndex, maxRoleNameLength, maxDescriptionLength]);
 
-  const togglePermission = (perm: PermissionsRoles) => {
-    const exists = form.permissions.some(p => p.id === perm.id);
-    const updatedPermissions = exists
-      ? form.permissions.filter(p => p.id !== perm.id)
-      : [...form.permissions, perm];
+  const togglePermission = (perm: PermissionsRoles | string) => {
+    const permId = typeof perm === 'string' ? perm : perm.id;
 
-    setForm({ ...form, permissions: updatedPermissions });
+    // Check if current permissions are strings or objects
+    const isStringArray = form.permissions.length > 0 && typeof form.permissions[0] === 'string';
+
+    if (isStringArray) {
+      // Handle string array
+      const stringPermissions = form.permissions as string[];
+      const exists = stringPermissions.includes(permId);
+      const updatedPermissions = exists
+        ? stringPermissions.filter(p => p !== permId)
+        : [...stringPermissions, permId];
+
+      setForm({ ...form, permissions: updatedPermissions });
+    } else {
+      // Handle object array
+      const objPermissions = form.permissions as PermissionsRoles[];
+      const exists = objPermissions.some(p => p.id === permId);
+      const updatedPermissions = exists
+        ? objPermissions.filter(p => p.id !== permId)
+        : [...objPermissions, typeof perm === 'string' ? { id: permId } as PermissionsRoles : perm];
+
+      setForm({ ...form, permissions: updatedPermissions });
+    }
   };
 
-  const selectAllPermissions = (permissions: PermissionsRoles[]) => {
-    // Create a map of existing permissions for quick lookup
-    const existingPermissionIds = new Set(form.permissions.map(p => p.id));
+  const selectAllPermissions = (permissions: PermissionsRoles[] | string[]) => {
+    // Determine if we're working with strings or objects
+    const isStringArray = form.permissions.length > 0 && typeof form.permissions[0] === 'string';
+    const isNewStringArray = permissions.length > 0 && typeof permissions[0] === 'string';
 
-    // Add permissions that aren't already selected
-    const newPermissions = permissions.filter(perm => !existingPermissionIds.has(perm.id));
+    if (isStringArray || (form.permissions.length === 0 && isNewStringArray)) {
+      // Handle as string arrays
+      const existingIds = new Set(form.permissions as string[]);
+      const newPermissions = (permissions as string[]).filter(p => !existingIds.has(p));
 
-    setForm({
-      ...form,
-      permissions: [...form.permissions, ...newPermissions]
-    });
+      setForm({
+        ...form,
+        permissions: [...(form.permissions as string[]), ...newPermissions]
+      });
+    } else {
+      // Handle as object arrays
+      const existingIds = new Set((form.permissions as PermissionsRoles[]).map(p => p.id));
+      const newPermissions = (permissions as PermissionsRoles[]).filter(p => !existingIds.has(p.id));
+
+      setForm({
+        ...form,
+        permissions: [...(form.permissions as PermissionsRoles[]), ...newPermissions]
+      });
+    }
   };
 
-  const deselectAllPermissions = (permissions: PermissionsRoles[]) => {
-    const permissionIdsToRemove = new Set(permissions.map(p => p.id));
-    const updatedPermissions = form.permissions.filter(p => !permissionIdsToRemove.has(p.id));
+  const deselectAllPermissions = (permissions: PermissionsRoles[] | string[]) => {
+    const isStringArray = form.permissions.length > 0 && typeof form.permissions[0] === 'string';
+    const isNewStringArray = permissions.length > 0 && typeof permissions[0] === 'string';
 
-    setForm({ ...form, permissions: updatedPermissions });
+    if (isStringArray || (form.permissions.length === 0 && isNewStringArray)) {
+      // Handle as string arrays
+      const idsToRemove = new Set(permissions as string[]);
+      const updatedPermissions = (form.permissions as string[]).filter(p => !idsToRemove.has(p));
+
+      setForm({ ...form, permissions: updatedPermissions });
+    } else {
+      // Handle as object arrays
+      const idsToRemove = new Set((permissions as PermissionsRoles[]).map(p => p.id));
+      const updatedPermissions = (form.permissions as PermissionsRoles[]).filter(p => !idsToRemove.has(p.id));
+
+      setForm({ ...form, permissions: updatedPermissions });
+    }
   };
 
   const areAllPermissionsSelected = (permissions: PermissionsRoles[]): boolean => {

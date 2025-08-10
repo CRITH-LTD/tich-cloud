@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useUMSDetail } from "../../dashboard.hooks";
 import { Breadcrumbs } from "../../../../components/Common/Breadcrumbs";
@@ -21,14 +21,39 @@ import {
     School2Icon
 } from "lucide-react";
 import { ContactItem, DepartmentCard, InfoCard, PlatformItem, RoleCard, StatCard, StatusBadge, TypeBadge } from "./ComponentLib";
+import { useDepartments } from "../../../../hooks/useDepartments";
+import { toast } from "react-toastify";
 
 
 const UMSDetailPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const { ums, isLoading, error, fetchUMS } = useUMSDetail();
+    const {
+        departments: deptData,
+        loading,
+        error: deptError,
+        refreshDepartments
+    } = useDepartments();
     const [openRole, setOpenRole] = useState<number | null>(null);
     const [openDept, setOpenDept] = useState<number | null>(null);
 
+    useEffect(() => {
+        if (error) toast.error(error);
+    }, [error]);
+
+    const didInit = useRef(false);
+    useEffect(() => {
+        if (didInit.current) return;
+        didInit.current = true;
+        (async () => {
+            try {
+                await refreshDepartments();
+            } catch (e) {
+                // already handled in hook; optional local log
+                console.error('Refresh failed:', e);
+            }
+        })();
+    }, [refreshDepartments]);
     const navigate = useNavigate();
     useEffect(() => {
         if (id) fetchUMS(id);
@@ -75,7 +100,7 @@ const UMSDetailPage: React.FC = () => {
             <div className="min-h-screen bg-gray-50">
                 {/* Header Section */}
                 <header className="bg-white rounded-lg border-b border-gray-200 shadow-sm">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="max-w-[85vw] mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="flex items-center justify-between py-6">
                             <div className="flex items-center space-x-6">
                                 {ums.umsLogoUrl && (
@@ -116,7 +141,7 @@ const UMSDetailPage: React.FC = () => {
                 </header>
 
                 {/* Main Content */}
-                <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <main className="max-w-[85vw] mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         {/* Left Column - Main Info */}
                         <div className="lg:col-span-2 space-y-6">
@@ -272,8 +297,8 @@ const UMSDetailPage: React.FC = () => {
                             {/* Departments */}
                             <InfoCard title="Departments" icon={School2Icon}>
                                 <div className="space-y-3">
-                                    {ums.departments?.length ? (
-                                        ums.departments.map((dept, idx) => (
+                                    {deptData?.length ? (
+                                        deptData.map((dept, idx) => (
                                             <DepartmentCard
                                                 key={dept.name}
                                                 department={dept}

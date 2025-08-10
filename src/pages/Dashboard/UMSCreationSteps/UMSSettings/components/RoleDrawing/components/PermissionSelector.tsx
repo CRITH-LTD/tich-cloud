@@ -4,7 +4,7 @@ import { PermissionsRoles } from '../../../../../../../interfaces/types';
 
 interface PermissionSelectorProps {
     allPermissions: PermissionsRoles[];
-    selectedPermissions: PermissionsRoles[];
+    selectedPermissions: PermissionsRoles[] | string[];
     onTogglePermission: (permission: PermissionsRoles) => void;
     onSelectAllPermissions: (permissions: PermissionsRoles[]) => void;
     onDeselectAllPermissions: (permissions: PermissionsRoles[]) => void;
@@ -134,10 +134,10 @@ export const PermissionSelector: React.FC<PermissionSelectorProps> = ({
                             onClick={handleBulkToggle}
                             disabled={disabled}
                             className={`flex items-center gap-2 px-3 py-1 text-sm rounded transition-colors ${disabled
-                                    ? 'text-gray-400 cursor-not-allowed'
-                                    : someCurrentSelected
-                                        ? 'text-orange-600 hover:text-orange-700 hover:bg-orange-50'
-                                        : 'text-blue-600 hover:text-blue-700 hover:bg-blue-50'
+                                ? 'text-gray-400 cursor-not-allowed'
+                                : someCurrentSelected
+                                    ? 'text-orange-600 hover:text-orange-700 hover:bg-orange-50'
+                                    : 'text-blue-600 hover:text-blue-700 hover:bg-blue-50'
                                 }`}
                         >
                             <BulkSelectIcon className="w-4 h-4" />
@@ -160,13 +160,14 @@ export const PermissionSelector: React.FC<PermissionSelectorProps> = ({
                 ) : (
                     <div className="grid grid-cols-1 gap-2">
                         {filteredPermissions.map((perm) => {
-                            const selected = selectedPermissions.find(p => p.id === perm.id);
+                            const permId = typeof perm === 'string' ? perm : perm.id;
+                            const selected = selectedPermissions.find(p => p === permId);
                             return (
                                 <label
                                     key={perm.id}
                                     className={`flex items-center p-2 rounded border cursor-pointer transition-colors ${selected
-                                            ? "bg-blue-50 border-blue-300"
-                                            : "bg-white border-gray-200 hover:bg-gray-50"
+                                        ? "bg-blue-50 border-blue-300"
+                                        : "bg-white border-gray-200 hover:bg-gray-50"
                                         }`}
                                 >
                                     <input

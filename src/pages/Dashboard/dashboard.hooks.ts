@@ -34,6 +34,7 @@ import { useNavigate, useParams } from "react-router";
 import UserInterface from "../../interfaces/user.interface";
 import { TABS } from "../../constants/constants";
 import { createFormPayload } from "../../utils";
+import { UMSIntro, UMSService } from "../../services/UMSService";
 
 export const useUMSSettings = () => {
     const { id } = useParams<{ id: string }>();
@@ -289,43 +290,114 @@ export const useUMSDetail = () => {
     return { ums, isLoading, error, fetchUMS };
 };
 
-export const useUMSManagement = () => {
+
+type ConfirmFn = (message: string) => Promise<boolean> | boolean;
+export const useUMSManagement = (confirmFn?: ConfirmFn) => {
     const dispatch = useDispatch<AppDispatch>();
-    const { umsList, loading, error, currentUMS } = useSelector((state: RootState) => state.umsManagement);
     const navigate = useNavigate();
 
+    const { umsList, loading, error, currentUMS } = useSelector(
+        (state: RootState) => state.umsManagement
+    );
+
+    // lightweight intro payload for the current tenant
+    const [intro, setIntro] = useState<UMSIntro | null>(null);
+    const [introLoading, setIntroLoading] = useState(false);
+
     const fetchUMSs = useCallback(() => {
-        dispatch(fetchAllUMS());
+        return dispatch(fetchAllUMS());
     }, [dispatch]);
 
-
+    const mountedRef = useRef(false);
     useEffect(() => {
-        fetchUMSs();
-    }, [fetchUMSs]);
-    const addUMS = (newUMS: Omit<UMS, 'id'>) => dispatch(createUMS(newUMS));
-    const modifyUMS = (id: string, data: Partial<UMS>) => dispatch(updateUMS({ id, data }));
-    const removeUMS = (id: string) => dispatch(deleteUMS(id));
-    const selectUMS = (ums: UMS | null) => dispatch(setCurrentUMS(ums));
-    const resetError = () => dispatch(clearError());
+        mountedRef.current = true;
+        return () => { mountedRef.current = false; };
+    }, []);
 
-    const handleAction = (action: 'view' | 'delete', umsId: string) => {
-        const ums = umsList.find((u) => u.id === umsId);
-        if (!ums) return;
-        if (action === 'view') {
-            navigate(`/dashboard/ums/${umsId}`);
-            setCurrentUMS(ums);
+    const fetchUMSIntro = useCallback(async () => {
+        setIntroLoading(true);
+        try {
+            const data = await UMSService.getIntro();
+
+            if (mountedRef.current) {
+                setIntro(data);
+            }
+            return data;
+        } finally {
+            if (mountedRef.current) setIntroLoading(false);
         }
-        if (action === 'delete') {
-            const confirmed = window.confirm(`Are you sure you want to terminate "${ums.umsName}"?`);
-            if (confirmed) deleteUMS(umsId);
-        }
-    };
+    }, []);
+
+
+    // initial boot – fetch intros (and optionally the full list)
+    useEffect(() => {
+        fetchUMSIntro().catch(() => { });
+        // if you need the list too, uncomment:
+        // fetchUMSs();
+    }, [fetchUMSIntro /*, fetchUMSs */]);
+
+    const addUMS = useCallback(
+        (payload: Omit<UMS, 'id'>) => dispatch(createUMS(payload)),
+        [dispatch]
+    );
+
+    const modifyUMS = useCallback(
+        (id: string, data: Partial<UMS>) => dispatch(updateUMS({ id, data })),
+        [dispatch]
+    );
+
+    const removeUMS = useCallback(
+        (id: string) => dispatch(deleteUMS(id)),
+        [dispatch]
+    );
+
+    const selectUMS = useCallback(
+        (ums: UMS | null) => dispatch(setCurrentUMS(ums)),
+        [dispatch]
+    );
+
+    const resetError = useCallback(() => {
+        dispatch(clearError());
+    }, [dispatch]);
+
+    const handleAction = useCallback(
+        async (action: 'view' | 'delete', umsId: string) => {
+            const ums = umsList.find(u => u.id === umsId);
+            if (!ums) return;
+
+            if (action === 'view') {
+                dispatch(setCurrentUMS(ums));
+                navigate(`/dashboard/ums/${umsId}`);
+                return;
+            }
+
+            if (action === 'delete') {
+                const ok = confirmFn
+                    ? await Promise.resolve(confirmFn(`Terminate "${ums.umsName}"? This cannot be undone.`))
+                    : true; // if no confirmFn provided, auto-confirm (or inject your headless dialog)
+                if (!ok) return;
+                await dispatch(deleteUMS(umsId));
+            }
+        },
+        [umsList, dispatch, navigate, confirmFn]
+    );
+
     return {
-        umsList,
+        // state
         currentUMS,
+        umsList,
         isLoading: loading,
         error,
+
+        // intro slice for the row UI
+        intro,
+        introLoading,
+
+        // data ops
         fetchUMSs,
+        fetchUMSIntro,
+
+        // actions
         handleAction,
         createUMS: addUMS,
         updateUMS: modifyUMS,
@@ -334,7 +406,6 @@ export const useUMSManagement = () => {
         clearError: resetError,
     };
 };
-
 
 export const usePermissions = () => {
     const [permissions, setPermissions] = useState<PermissionsData | null>(null);

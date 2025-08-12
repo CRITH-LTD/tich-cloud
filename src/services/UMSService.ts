@@ -1,6 +1,16 @@
 import api from '../config/axios';
 import { ApiResponse } from '../types/department.types';
 
+export type UMSIntro = {
+    id: string;
+    name: string;
+    type?: string;
+    logoUrl?: string | null;
+    modulesCount: number;
+    platforms: { teacherApp: boolean; studentApp: boolean };
+    status: 'active' | 'inactive';
+    createdAt?: string;
+};
 export interface UMS {
     id?: string;
     _id?: string;
@@ -47,6 +57,11 @@ const unwrap = <T>(payload: ApiResponse<T> | T): T => {
 
 export class UMSService {
     private static readonly BASE_URL = '/ums';
+
+    static async getIntro(): Promise<UMSIntro> {
+        const res = await api.get<UMSIntro>('/ums/intro');
+        return res.data;
+    }
 
     // ---------- Modules ----------
     static async getModules(): Promise<string[]> {

@@ -607,8 +607,11 @@ export const TABS: Tab[] = [
   { id: 'general', label: 'General', icon: Settings },
   { id: 'admin', label: 'Admin', icon: Crown },
   { id: 'security', label: 'Security', icon: Shield },
+  { id: 'matricule', label: 'Matricule Configuration', icon: GraduationCap },
   { id: 'roles', label: 'Roles & Permissions', icon: Key },
   { id: 'departments', label: 'Departments', icon: School2Icon },
+  { id: 'programs', label: 'Programs', icon: BookOpen },
+  { id: 'students', label: 'Students', icon: Users },
   { id: 'modules', label: 'Modules & Platforms', icon: Database },
   { id: 'danger', label: 'Danger Zone', icon: AlertTriangle }
 ];

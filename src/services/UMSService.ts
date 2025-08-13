@@ -10,6 +10,11 @@ export type UMSIntro = {
     platforms: { teacherApp: boolean; studentApp: boolean };
     status: 'active' | 'inactive';
     createdAt?: string;
+    matriculeConfig?: {
+        format: string;
+        placeholders: Record<string, string>;
+        sequenceLength: number;
+    };
 };
 export interface UMS {
     id?: string;

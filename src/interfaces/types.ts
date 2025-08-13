@@ -166,6 +166,39 @@ export interface UMS {
   id: string;
 }
 
+export interface Program {
+    _id?: string;
+    name: string;
+    description?: string;
+    duration: number;
+    startDate: string;
+    endDate: string;
+    departmentId: string;
+}
+
+export interface Student {
+    _id?: string;
+    matricule: string;
+    fullName: string;
+    phone: string;
+    program: string; // Program ID
+    user?: string; // User ID reference
+    sponsor?: string; // Sponsor User ID reference
+    umsId: string; // UMS ID reference
+    customFields: Record<string, unknown>;
+    createdAt?: string;
+    updatedAt?: string;
+}
+
+export type CreateStudentDto = {
+    fullName: string;
+    email?: string;
+    phone: string;
+    program: string;
+    customFields?: Record<string, unknown>;
+};
+
+export type UpdateStudentDto = Partial<CreateStudentDto>;
 // _____________________________________________
 // Base permission interface
 export interface Permission {

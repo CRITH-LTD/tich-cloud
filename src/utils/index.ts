@@ -119,3 +119,13 @@ export const createFormPayload = async (currentData: UMSForm, originalData: any)
 
     return hasChanges ? payload : null;
 };
+
+export const fmtDate = (iso?: string) => (iso ? new Date(iso).toLocaleDateString() : '—');
+export const fmtPhone = (phone: string) => {
+    // Format Cameroon phone numbers nicely
+    if (phone.startsWith('+237')) {
+        const num = phone.slice(4);
+        return `+237 ${num.slice(0, 3)} ${num.slice(3, 5)} ${num.slice(5)}`;
+    }
+    return phone;
+};

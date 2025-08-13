@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import {
-    useCreateUMS,
+    // useCreateUMS,
     usePermissions,
     useUMSDetail,
     useUMSSettings
@@ -21,6 +21,9 @@ import {
 } from "./components/common";
 import { XCircle } from "lucide-react";
 import { Role } from "../../../../interfaces/types";
+import ProgramSettings from "./components/ProgramSettings";
+import StudentSettings from "./components/StudentSettings";
+import MatriculeSettings from "./components/MatriculeSettings";
 
 const UMSSettingsPage: React.FC = () => {
     const { error, ums } = useUMSDetail();
@@ -45,10 +48,10 @@ const UMSSettingsPage: React.FC = () => {
         // Handlers
         handleInputChange,
         handleSave,
-        handleReset,
+        // handleReset,
         handleRoleUpdate,
         handleRoleAdd,
-        handleRoleRemove,
+        // handleRoleRemove,
 
         // Loading states
         isLoadingUMS,
@@ -64,11 +67,11 @@ const UMSSettingsPage: React.FC = () => {
     const [editingRoleData, setEditingRoleData] = useState<Role | null>(null);
     const [roleSubmissionLoading, setRoleSubmissionLoading] = useState(false);
 
-    const openRoleDrawer = (role?: Role, index?: number) => {
-        setEditingRoleIndex(index ?? null);
-        setEditingRoleData(role ?? null);
-        setRoleDrawerOpen(true);
-    };
+    // const openRoleDrawer = (role?: Role, index?: number) => {
+    //     setEditingRoleIndex(index ?? null);
+    //     setEditingRoleData(role ?? null);
+    //     setRoleDrawerOpen(true);
+    // };
 
     const closeRoleDrawer = () => {
         setRoleDrawerOpen(false);
@@ -149,6 +152,12 @@ const UMSSettingsPage: React.FC = () => {
                     // onTogglePassword={() => setShowPassword(!showPassword)}
                     />
                 );
+            case "matricule":
+                return (
+                    <MatriculeSettings 
+                    formData={formData}
+                        onInputChange={handleInputChange} />
+                );
             case "modules":
                 return (
                     <ModulesSettings />
@@ -156,17 +165,26 @@ const UMSSettingsPage: React.FC = () => {
             case "roles":
                 return (
                     <RolesSettings
-                        formData={formData}
-                        allPermissions={allPermissions}
-                        onAddRole={() => openRoleDrawer()}
-                        onEditRole={(i) => openRoleDrawer(formData.roles[i], i)}
-                        onDeleteRole={(i) => handleRoleRemove(i)}
+                        // // formData={formData}
+                        // allPermissions={allPermissions}
+                        // onAddRole={() => openRoleDrawer()}
+                        // onEditRole={(i) => openRoleDrawer(formData.roles[i], i)}
+                        // onDeleteRole={(i) => handleRoleRemove(i)}
                     />
                 );
             case "departments":
                 return (
                     <DepartmentsSettings />
                 );
+            case "programs":
+                return (
+                    <ProgramSettings />
+                );
+            case "students":
+                return (
+                    <StudentSettings />
+                );
+
             case "danger":
                 return <DangerZone />;
             default:
@@ -186,7 +204,7 @@ const UMSSettingsPage: React.FC = () => {
                 onTabChange={setActiveTab}
                 unsavedChanges={hasUnsavedChanges} // Fixed: use hasUnsavedChanges from hook
                 onSave={handleSave}
-                onReset={handleReset} // Added reset functionality
+                // onReset={handleReset} // Added reset functionality
             >
                 {renderTabContent()}
             </SettingsLayout>

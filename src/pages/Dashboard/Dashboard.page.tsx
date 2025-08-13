@@ -22,10 +22,12 @@ import { Link } from "react-router-dom";
 import { pathnames } from "../../routes/path-names";
 import { useUMSManagement } from "./dashboard.hooks";
 import ShimmerLoader from "../../components/Common/ShimmerLoader ";
+import { useEffect, useState } from "react";
+import { UMSIntro } from "../../services/UMSService";
 
 const DashboardPage = () => {
     const {
-        intro,
+        intro: introz,
         introLoading,
         isLoading,
         error,
@@ -34,8 +36,11 @@ const DashboardPage = () => {
         currentUMS,
     } = useUMSManagement();
 
+    const [intro, setIntro] = useState<UMSIntro | null>(null);
+    useEffect(() => {
+        setIntro(introz)
+    }, [introz])
     // Determine if UMS exists based on intro data
-    console.log("introoo", intro)
     const hasUMS = intro !== null;
 
     // Mock data for demonstration - using intro data when available

@@ -167,35 +167,69 @@ export interface UMS {
 }
 
 export interface Program {
-    _id?: string;
-    name: string;
-    description?: string;
-    duration: number;
-    startDate: string;
-    endDate: string;
-    departmentId: string;
+  _id?: string;
+  name: string;
+  description?: string;
+  duration: number;
+  startDate: string;
+  endDate: string;
+  departmentId: string;
 }
 
 export interface Student {
-    _id?: string;
-    matricule: string;
-    fullName: string;
+  id: string;
+  matricule: string;
+  fullName: string;
+  level: string; // e.g., "200", "300"
+  gender: gender;
+  phone: string;
+
+  programId: string;
+  programName: string;
+
+  departmentId: string;
+  departmentName: string;
+
+  guardian: {
+    name: string;
     phone: string;
-    program: string; // Program ID
-    user?: string; // User ID reference
-    sponsor?: string; // Sponsor User ID reference
-    umsId: string; // UMS ID reference
-    customFields: Record<string, unknown>;
-    createdAt?: string;
-    updatedAt?: string;
+    address: string;
+  };
+
+  user: {
+    id: string;
+    email: string;
+  };
+
+  umsId: string;
+
+  customFields?: Record<string, unknown>;
+
+  createdAt?: string;
+  updatedAt?: string;
 }
 
+
+
 export type CreateStudentDto = {
-    fullName: string;
-    email?: string;
-    phone: string;
-    program: string;
-    customFields?: Record<string, unknown>;
+  fullName: string;
+  email?: string;
+  phone: string;
+  level: string; 
+  gender: gender;
+  program: string;
+  guardian: string;
+  guardianPhone: string;
+  guardianAddress: string;
+  customFields?: Record<string, unknown>;
+};
+
+type gender = 'male'|'female'|'prefer not to say';
+
+export const GENDER_ENUM = {
+  MALE: 'male' as gender,
+  FEMALE: 'female' as gender,
+  PREFER_NOT_TO_SAY: 'prefer not to say' as gender
 };
 
 export type UpdateStudentDto = Partial<CreateStudentDto>;

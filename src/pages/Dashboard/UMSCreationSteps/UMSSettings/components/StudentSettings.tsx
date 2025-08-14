@@ -15,6 +15,9 @@ import {
     Search,
     Filter,
     X,
+    Mail,
+    User,
+    Shield,
 } from 'lucide-react';
 
 import ConfirmDialog from '../../../../../components/Common/ConfirmDialog';
@@ -85,13 +88,13 @@ const StudentSettings: React.FC = () => {
     // Filtered students
     const filteredStudents = useMemo(() => {
         return students.filter(student => {
-            const matchesSearch = !searchTerm || 
+            const matchesSearch = !searchTerm ||
                 student.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 student.matricule.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 student.phone.includes(searchTerm);
-            
-            const matchesProgram = !selectedProgram || student.program === selectedProgram;
-            
+
+            const matchesProgram = !selectedProgram || student.programId === selectedProgram;
+
             return matchesSearch && matchesProgram;
         });
     }, [students, searchTerm, selectedProgram]);
@@ -259,27 +262,31 @@ const StudentSettings: React.FC = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {filteredStudents.map((student, idx) => {
                                 // Find original index for edit/delete operations
-                                const originalIndex = students.findIndex(s => s._id === student._id);
-                                
+                                const originalIndex = students.findIndex(s => s.id === student.id);
+
                                 return (
-                                    <div key={student._id ?? `student-${idx}`} className="border border-gray-200 rounded-lg p-4 hover:shadow-md bg-white transition-shadow">
-                                        <div className="flex items-start justify-between mb-3">
+                                    <div
+                                        key={student.id ?? `student-${idx}`}
+                                        className="border border-gainsboro-100 rounded-lg p-4  bg-white transition-all duration-200 hover:border-gray-300 group"
+                                    >
+                                        {/* Header: Avatar + Name + Matricule + Actions */}
+                                        <div className="flex items-start justify-between mb-4">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                                                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-sm">
                                                     {student.fullName.charAt(0).toUpperCase()}
                                                 </div>
                                                 <div className="min-w-0">
-                                                    <h4 className="font-medium text-gray-900 truncate">{student.fullName}</h4>
-                                                    <p className="text-xs text-gray-500">Mat: {student.matricule}</p>
+                                                    <h4 className="font-medium text-gray-900 truncate text-base">{student.fullName}</h4>
+                                                    <p className="text-xs text-gray-500 mt-0.5">Matricule: {student.matricule}</p>
                                                 </div>
                                             </div>
 
-                                            <div className="flex items-center gap-1">
+                                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <button
                                                     onClick={() => handleOpenEdit(originalIndex)}
                                                     disabled={loading}
                                                     title="Edit student"
-                                                    className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg disabled:opacity-50 transition-colors"
+                                                    className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg disabled:opacity-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-200"
                                                 >
                                                     <Edit className="h-4 w-4" />
                                                 </button>
@@ -287,59 +294,100 @@ const StudentSettings: React.FC = () => {
                                                     onClick={() => requestDelete(originalIndex)}
                                                     disabled={loading}
                                                     title="Delete student"
-                                                    className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg disabled:opacity-50 transition-colors"
+                                                    className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg disabled:opacity-50 transition-colors focus:outline-none focus:ring-2 focus:ring-red-200"
                                                 >
                                                     <Trash2 className="h-4 w-4" />
                                                 </button>
                                             </div>
                                         </div>
 
-                                        <div className="space-y-2 text-sm">
+                                        {/* Main Info Grid */}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-700">
                                             {/* Contact Info */}
-                                            <div className="flex items-center gap-2 text-gray-600">
-                                                <Phone className="h-4 w-4 text-gray-400" />
-                                                <span>{fmtPhone(student.phone)}</span>
+                                            <div className="flex items-start gap-2">
+                                                <Phone className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                                                <span className="break-all">{fmtPhone(student.phone)}</span>
                                             </div>
 
-                                            {/* Program */}
-                                            <div className="flex items-center gap-2 text-gray-600">
-                                                <GraduationCap className="h-4 w-4 text-gray-400" />
-                                                <span className="truncate">{getProgramName(student.program)}</span>
+                                            {/* Academic Info */}
+                                            <div className="flex items-start gap-2">
+                                                <GraduationCap className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                                                <span>
+                                                    <span className="font-medium">{student.programName}</span> <br />
+                                                    <span className="text-gray-500 text-xs ml-1">({student.departmentName})</span>
+                                                </span>
                                             </div>
 
-                                            {/* Registration Date */}
-                                            {student.createdAt && (
-                                                <div className="flex items-center gap-2 text-gray-500">
-                                                    <Calendar className="h-4 w-4 text-gray-400" />
-                                                    <span>Registered {fmtDate(student.createdAt)}</span>
+                                            {/* Email */}
+                                            {student.user?.email && (
+                                                <div className="flex items-start gap-2">
+                                                    <Mail className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                                                    <span className="break-all">{student.user.email}</span>
                                                 </div>
                                             )}
 
-                                            {/* Custom Fields Preview */}
-                                            {student.customFields && Object.keys(student.customFields).length > 0 && (
-                                                <div className="pt-2 border-t border-gray-100">
-                                                    <div className="flex items-center gap-1 text-xs text-gray-500 mb-1">
-                                                        <Info className="h-3 w-3" />
-                                                        <span>Additional Info</span>
+                                            {/* Personal Info */}
+                                            <div className="flex items-start gap-2">
+                                                <User className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                                                <div>
+                                                    <span className="block">Level {student.level}</span>
+                                                    <span className="text-gray-500 text-xs">Gender: {student.gender}</span>
+                                                </div>
+                                            </div>
+
+                                            {/* Guardian Info */}
+                                            {student.guardian && (
+                                                <div className="flex flex-col gap-1.5 col-span-2 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                                    <div className="flex items-center gap-1">
+                                                        <Shield className="h-4 w-4 text-gray-400" />
+                                                        <span className="text-gray-500 text-xs font-medium uppercase tracking-wide">Guardian</span>
                                                     </div>
-                                                    <div className="space-y-1">
-                                                        {Object.entries(student.customFields).slice(0, 2).map(([key, value]) => (
-                                                            <div key={key} className="flex text-xs">
-                                                                <span className="text-gray-500 capitalize">{key.replace('_', ' ')}:</span>
-                                                                <span className="text-gray-700 ml-1 truncate">{String(value)}</span>
+                                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-sm">
+                                                        <div>
+                                                            <p className="text-gray-500 text-xs">Name</p>
+                                                            <p className="text-gray-700">{student.guardian.name || '-'}</p>
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-gray-500 text-xs">Phone</p>
+                                                            <p className="text-gray-700">{student.guardian.phone || '-'}</p>
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-gray-500 text-xs">Address</p>
+                                                            <p className="text-gray-700 truncate">{student.guardian.address || '-'}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Registration Date */}
+                                            {student.createdAt && (
+                                                <div className="flex items-center gap-2 col-span-2 text-gray-500 text-xs pt-1 border-t border-gray-100">
+                                                    <Calendar className="h-4 w-4 text-gray-400" />
+                                                    <span>Registered on {fmtDate(student.createdAt)}</span>
+                                                </div>
+                                            )}
+
+                                            {/* Custom Fields */}
+                                            {student.customFields && Object.keys(student.customFields).length > 0 && (
+                                                <div className="pt-3 border-t border-gray-100 col-span-2">
+                                                    <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
+                                                        <Info className="h-3.5 w-3.5" />
+                                                        <span className="font-medium">ADDITIONAL INFORMATION</span>
+                                                    </div>
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                        {Object.entries(student.customFields).map(([key, value]) => (
+                                                            <div key={key} className="text-sm">
+                                                                <p className="text-gray-500 text-xs capitalize">{key.replace('_', ' ')}</p>
+                                                                <p className="text-gray-700 truncate">{String(value) || '-'}</p>
                                                             </div>
                                                         ))}
-                                                        {Object.keys(student.customFields).length > 2 && (
-                                                            <div className="text-xs text-gray-400">
-                                                                +{Object.keys(student.customFields).length - 2} more fields
-                                                            </div>
-                                                        )}
                                                     </div>
                                                 </div>
                                             )}
                                         </div>
                                     </div>
                                 );
+
                             })}
                         </div>
                     ) : students.length === 0 ? (
@@ -395,29 +443,55 @@ const StudentSettings: React.FC = () => {
                 {students.length > 0 && (
                     <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
                         <h4 className="text-md font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                            <Building2 className="w-4 h-4" />
+                            <Building2 className="w-5 h-5 text-gray-600" />
                             Statistics Overview
                         </h4>
+
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            <div className="bg-blue-50 rounded-lg p-4">
-                                <div className="text-2xl font-bold text-blue-700">{students.length}</div>
-                                <div className="text-sm text-blue-600">Total Students</div>
-                            </div>
-                            <div className="bg-indigo-50 rounded-lg p-4">
-                                <div className="text-2xl font-bold text-indigo-700">
-                                    {new Set(students.map(s => s.program)).size}
+                            {/* Total Students */}
+                            <div className="flex items-center gap-3 bg-blue-50 rounded-lg p-4 hover:shadow-md transition-shadow">
+                                <div className="p-2 rounded-full bg-blue-100">
+                                    <Users className="w-5 h-5 text-blue-700" />
                                 </div>
-                                <div className="text-sm text-indigo-600">Active Programs</div>
-                            </div>
-                            <div className="bg-green-50 rounded-lg p-4">
-                                <div className="text-2xl font-bold text-green-700">
-                                    {students.filter(s => s.createdAt && new Date(s.createdAt) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).length}
+                                <div>
+                                    <div className="text-2xl font-bold text-blue-700">{students.length.toLocaleString()}</div>
+                                    <div className="text-sm text-blue-600">Total Students</div>
                                 </div>
-                                <div className="text-sm text-green-600">New This Month</div>
+                            </div>
+
+                            {/* Active Programs */}
+                            <div className="flex items-center gap-3 bg-indigo-50 rounded-lg p-4 hover:shadow-md transition-shadow">
+                                <div className="p-2 rounded-full bg-indigo-100">
+                                    <GraduationCap className="w-5 h-5 text-indigo-700" />
+                                </div>
+                                <div>
+                                    <div className="text-2xl font-bold text-indigo-700">
+                                        {new Set(students.map(s => s.programName)).size.toLocaleString()}
+                                    </div>
+                                    <div className="text-sm text-indigo-600">Active Programs</div>
+                                </div>
+                            </div>
+
+                            {/* New This Month */}
+                            <div className="flex items-center gap-3 bg-green-50 rounded-lg p-4 hover:shadow-md transition-shadow">
+                                <div className="p-2 rounded-full bg-green-100">
+                                    <Calendar className="w-5 h-5 text-green-700" />
+                                </div>
+                                <div>
+                                    <div className="text-2xl font-bold text-green-700">
+                                        {students.filter(
+                                            s =>
+                                                s.createdAt &&
+                                                new Date(s.createdAt) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+                                        ).length.toLocaleString()}
+                                    </div>
+                                    <div className="text-sm text-green-600">New This Month</div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 )}
+
             </div>
 
             {/* Modal */}

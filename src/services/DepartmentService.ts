@@ -1,86 +1,109 @@
 import api from '../config/axios';
-import { CreateDepartmentDto, ApiResponse, UpdateDepartmentDto, Department } from '../types/department.types';
+import {
+    CreateDepartmentDto,
+    UpdateDepartmentDto,
+    Department,
+    ApiResponse,
+} from '../types/department.types';
+
+type ParentType = 'Faculty' | 'School' | 'CertificationProgram';
 
 export class DepartmentService {
-    private static readonly BASE_URL = '/departments';
-
-    /**
-     * Create a new department
-     */
-    static async createDepartment(payload: CreateDepartmentDto): Promise<Department> {
-        try {
-            const response = await api.post<ApiResponse<Department>>(
-                DepartmentService.BASE_URL,
-                payload
-            );
-            return response.data.data;
-        } catch (error) {
-            console.error('Error creating department:', error);
-            throw new Error('Failed to create department. Please try again.');
+    private static buildBaseUrl(
+        parentType?: ParentType,
+        parentId?: string
+    ): string {
+        switch (parentType) {
+            case 'Faculty':
+                return `departments/faculties/${parentId}/departments`;
+            case 'School':
+                return `departments/schools/${parentId}/departments`;
+            case 'CertificationProgram':
+                return `departments/certification-programs/${parentId}/departments`;
+            default:
+                return '/departments';
         }
     }
 
-    /**
-     * Get all departments for current UMS
-     */
-    static async getDepartments(): Promise<Department[]> {
-        try {
-            const response = await api.get<ApiResponse<Department[]>>(
-                DepartmentService.BASE_URL
-            );
-            console.log('Fetched departmentszs:', response.data);
-            return response.data as unknown as Department[];
-        } catch (error) {
-            console.error('Error fetching departments:', error);
-            throw new Error('Failed to fetch departments. Please try again.');
-        }
-    }
-
-    /**
-     * Get a single department by ID
-     */
-    static async getDepartment(id: string): Promise<Department> {
-        try {
-            const response = await api.get<ApiResponse<Department>>(
-                `${DepartmentService.BASE_URL}/${id}`
-            );
-            return response.data.data;
-        } catch (error) {
-            console.error('Error fetching department:', error);
-            throw new Error('Failed to fetch department. Please try again.');
-        }
-    }
-
-    /**
-     * Update an existing department
-     */
-    static async updateDepartment(
-        id: string,
-        payload: UpdateDepartmentDto
+    static async create(
+        dto: CreateDepartmentDto,
+        parentId: string,
+        parentType: ParentType
     ): Promise<Department> {
-        try {
-            const response = await api.patch<ApiResponse<Department>>(
-                `${DepartmentService.BASE_URL}/${id}`,
-                payload
-            );
-            return response.data.data;
-        } catch (error) {
-            console.error('Error updating department:', error);
-            throw new Error('Failed to update department. Please try again.');
-        }
+        const url = this.buildBaseUrl(parentType, parentId);
+        const response = await api.post<ApiResponse<Department>>(url, dto);
+        return response.data.data;
     }
 
-    /**
-     * Delete a department
-     */
-    static async deleteDepartment(id: string): Promise<void> {
-        try {
-            await api.delete<ApiResponse<void>>(
-                `${DepartmentService.BASE_URL}/${id}`
-            );
-        } catch (error) {
-            console.error('Error deleting department:', error);
-            throw new Error('Failed to delete department. Please try again.');
-        }
+    static async findAll(
+        parentId: string,
+        parentType: ParentType
+    ): Promise<Department[]> {
+        const url = this.buildBaseUrl(parentType, parentId);
+        const response = await api.get<ApiResponse<Department[]>>(url);
+        return response.data.data;
+    }
+
+    static async findAllByUMS(): Promise<Department[]> {
+        const url = this.buildBaseUrl();
+        const response = await api.get<ApiResponse<Department[]>>(url);
+        return response.data.data;
+    }
+
+    static async findOne(
+        id: string,
+        parentId: string,
+        parentType: ParentType
+    ): Promise<Department> {
+        const url = `${this.buildBaseUrl(parentType, parentId)}/${id}`;
+        const response = await api.get<ApiResponse<Department>>(url);
+        return response.data.data;
+    }
+
+    static async update(
+        id: string,
+        dto: UpdateDepartmentDto,
+        parentId: string,
+        parentType: ParentType
+    ): Promise<Department> {
+        const url = `${this.buildBaseUrl(parentType, parentId)}/${id}`;
+        const response = await api.patch<ApiResponse<Department>>(url, dto);
+        return response.data.data;
+    }
+
+    static async remove(
+        id: string,
+        parentId: string,
+        parentType: ParentType
+    ): Promise<void> {
+        const url = `${this.buildBaseUrl(parentType, parentId)}/${id}`;
+        await api.delete(url);
+    }
+
+    static async getPerformance(
+        parentId: string,
+        parentType: ParentType
+    ): Promise<any> {
+        const url = `${this.buildBaseUrl(parentType, parentId)}/performance`;
+        const response = await api.get(url);
+        return response.data;
+    }
+
+    static async searchByName(
+        searchTerm: string,
+        parentId: string,
+        parentType: ParentType
+    ): Promise<Department[]> {
+        const response = await api.get<ApiResponse<Department[]>>(
+            `/departments/search`,
+            {
+                params: {
+                    q: searchTerm,
+                    parentId,
+                    parentType,
+                },
+            }
+        );
+        return response.data.data;
     }
 }

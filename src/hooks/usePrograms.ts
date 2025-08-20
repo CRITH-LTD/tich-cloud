@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
-import { ProgramService, type Program, type CreateProgramDto, type UpdateProgramDto } from '../services/ProgramService';
+import { ProgramService,  } from '../services/ProgramService';
+import { Program, type CreateProgramDto, type UpdateProgramDto } from '../interfaces/types';
 
 export interface UseProgramsReturn {
     programs: Program[];

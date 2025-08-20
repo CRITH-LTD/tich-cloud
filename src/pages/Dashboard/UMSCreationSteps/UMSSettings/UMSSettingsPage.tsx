@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
-    // useCreateUMS,
     usePermissions,
     useUMSDetail,
-    useUMSSettings
+    useUMSSettings,
 } from "../../dashboard.hooks";
 import { Breadcrumbs } from "../../../../components/Common/Breadcrumbs";
 import {
@@ -17,45 +17,34 @@ import {
     SettingsLayout,
     ErrorMessage,
     LoadingSpinner,
-    RoleDrawer
+    RoleDrawer,
 } from "./components/common";
 import { XCircle } from "lucide-react";
 import { Role } from "../../../../interfaces/types";
 import ProgramSettings from "./components/ProgramSettings";
 import StudentSettings from "./components/StudentSettings";
 import MatriculeSettings from "./components/MatriculeSettings";
+import AcademicUnitsSettings from "./components/AcademicUnitsSettings";
+import { TABS } from "../../../../constants/constants";
 
 const UMSSettingsPage: React.FC = () => {
     const { error, ums } = useUMSDetail();
 
     const {
-        // id,
         currentUMS,
         formData,
-
-        // UI state
         activeTab,
         setActiveTab,
-        // showPassword,
-        // setShowPassword,
         tabs,
-
-        // Save state
         isLoading,
         hasUnsavedChanges,
         savingError,
-
-        // Handlers
         handleInputChange,
         handleSave,
-        // handleReset,
         handleRoleUpdate,
         handleRoleAdd,
-        // handleRoleRemove,
-
-        // Loading states
         isLoadingUMS,
-        isReady
+        isReady,
     } = useUMSSettings();
 
     const { getAllPermissions } = usePermissions();
@@ -67,11 +56,27 @@ const UMSSettingsPage: React.FC = () => {
     const [editingRoleData, setEditingRoleData] = useState<Role | null>(null);
     const [roleSubmissionLoading, setRoleSubmissionLoading] = useState(false);
 
-    // const openRoleDrawer = (role?: Role, index?: number) => {
-    //     setEditingRoleIndex(index ?? null);
-    //     setEditingRoleData(role ?? null);
-    //     setRoleDrawerOpen(true);
-    // };
+    // URL search params for tab sync
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    // Sync tab with URL
+    useEffect(() => {
+        const tabParam = searchParams.get("tab");
+        if (tabParam && TABS.some((t) => t.id === tabParam)) {
+            setActiveTab(tabParam);
+        } else if (!tabParam) {
+            // default to first tab
+            setSearchParams({ tab: TABS[0].id });
+        }
+    }, [searchParams, setActiveTab, setSearchParams]);
+
+    const handleTabChange = useCallback(
+        (tabId: string) => {
+            setActiveTab(tabId);
+            setSearchParams({ tab: tabId });
+        },
+        [setActiveTab, setSearchParams]
+    );
 
     const closeRoleDrawer = () => {
         setRoleDrawerOpen(false);
@@ -82,30 +87,54 @@ const UMSSettingsPage: React.FC = () => {
 
     const handleRoleSubmit = async (role: Role, index?: number) => {
         setRoleSubmissionLoading(true);
-
         try {
-            console.log("Processing role submission");
-
             if (index !== undefined) {
-                console.log("Updating existing role at index:", index);
                 await handleRoleUpdate(index, role);
             } else {
-                console.log("Adding new role");
                 await handleRoleAdd(role);
             }
-
-            // Close drawer after successful submission
             closeRoleDrawer();
         } catch (error) {
-            // Error handling - the RoleDrawer will handle displaying errors
-            console.error('Failed to save role:', error);
-            throw error; // Re-throw to let RoleDrawer handle it
+            console.error("Failed to save role:", error);
+            throw error;
         } finally {
             setRoleSubmissionLoading(false);
         }
     };
 
-    // Show loading spinner while data is being fetched
+    // Map tabs to components (declarative instead of switch)
+    const tabContentMap: Record<string, React.ReactNode> = useMemo(
+        () => ({
+            general: (
+                <GeneralSettings formData={formData} onInputChange={handleInputChange} />
+            ),
+            admin: (
+                <AdminSettings formData={formData} onInputChange={handleInputChange} />
+            ),
+            security: (
+                <SecuritySettings
+                    formData={formData}
+                    onInputChange={handleInputChange}
+                />
+            ),
+            matricule: (
+                <MatriculeSettings
+                    formData={formData}
+                    onInputChange={handleInputChange}
+                />
+            ),
+            modules: <ModulesSettings />,
+            roles: <RolesSettings />,
+            academicUnits: <AcademicUnitsSettings />,
+            departments: <DepartmentsSettings />,
+            programs: <ProgramSettings />,
+            students: <StudentSettings />,
+            danger: <DangerZone />,
+        }),
+        [formData, handleInputChange]
+    );
+
+    // Loading
     if (isLoadingUMS || !isReady) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -114,7 +143,7 @@ const UMSSettingsPage: React.FC = () => {
         );
     }
 
-    // Show error if there's an issue loading data
+    // Error
     if (error || !currentUMS) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -127,86 +156,26 @@ const UMSSettingsPage: React.FC = () => {
         );
     }
 
-    const renderTabContent = () => {
-        switch (activeTab) {
-            case "general":
-                return (
-                    <GeneralSettings
-                        formData={formData}
-                        onInputChange={handleInputChange}
-                    />
-                );
-            case "admin":
-                return (
-                    <AdminSettings
-                        formData={formData}
-                        onInputChange={handleInputChange}
-                    />
-                );
-            case "security":
-                return (
-                    <SecuritySettings
-                        formData={formData}
-                        onInputChange={handleInputChange}
-                    // showPassword={showPassword}
-                    // onTogglePassword={() => setShowPassword(!showPassword)}
-                    />
-                );
-            case "matricule":
-                return (
-                    <MatriculeSettings 
-                    formData={formData}
-                        onInputChange={handleInputChange} />
-                );
-            case "modules":
-                return (
-                    <ModulesSettings />
-                );
-            case "roles":
-                return (
-                    <RolesSettings
-                        // // formData={formData}
-                        // allPermissions={allPermissions}
-                        // onAddRole={() => openRoleDrawer()}
-                        // onEditRole={(i) => openRoleDrawer(formData.roles[i], i)}
-                        // onDeleteRole={(i) => handleRoleRemove(i)}
-                    />
-                );
-            case "departments":
-                return (
-                    <DepartmentsSettings />
-                );
-            case "programs":
-                return (
-                    <ProgramSettings />
-                );
-            case "students":
-                return (
-                    <StudentSettings />
-                );
-
-            case "danger":
-                return <DangerZone />;
-            default:
-                return null;
-        }
-    };
-
     return (
         <>
             <Breadcrumbs />
             <SettingsLayout
-                isUpdating={isLoading} // Fixed: use isLoading from hook
+                isUpdating={isLoading}
                 savingError={savingError}
-                umsName={currentUMS?.umsName || ums?.umsName || 'UMS'} // Fixed: use available UMS name
+                umsName={currentUMS?.umsName || ums?.umsName || "UMS"}
                 tabs={tabs}
                 activeTab={activeTab}
-                onTabChange={setActiveTab}
-                unsavedChanges={hasUnsavedChanges} // Fixed: use hasUnsavedChanges from hook
+                onTabChange={handleTabChange}
+                unsavedChanges={hasUnsavedChanges}
                 onSave={handleSave}
-                // onReset={handleReset} // Added reset functionality
             >
-                {renderTabContent()}
+                {tabContentMap[activeTab] || (
+                    <ErrorMessage
+                        icon={XCircle}
+                        title="Unknown Tab"
+                        message={`The tab "${activeTab}" does not exist.`}
+                    />
+                )}
             </SettingsLayout>
 
             <RoleDrawer

@@ -18,12 +18,9 @@ import {
     Maximize2
 } from 'lucide-react';
 import { templateSuggestions } from '../../../constants/constants';
+import { MatriculeConfig, PlaceholderType } from '../../../interfaces/types';
 
-interface MatriculeConfig {
-    format?: string;
-    placeholders?: Record<string, string>;
-    sequenceLength?: number;
-}
+
 
 interface MatriculeConfiguratorProps {
     value: MatriculeConfig;
@@ -62,12 +59,17 @@ export const MatriculeConfigurator: React.FC<MatriculeConfiguratorProps> = ({
     value,
     onChange,
 }) => {
-    const [localConfig, setLocalConfig] = useState<MatriculeConfig>(value);
+    const [localConfig, setLocalConfig] = useState<MatriculeConfig>({
+        ...value,
+        placeholders: value.placeholders ?? {},
+        placeholderTypes: value.placeholderTypes ?? {},
+    });
     const [preview, setPreview] = useState<string>(generatePreview(localConfig));
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState<string>('Universities');
     const [copiedPreview, setCopiedPreview] = useState(false);
     const [newPlaceholderKey, setNewPlaceholderKey] = useState('');
+    const [newPlaceholderType, setNewPlaceholderType] = useState<PlaceholderType | ''>('');
     const [isMinimized, setIsMinimized] = useState(false);
     const [showAdvanced, setShowAdvanced] = useState(false);
     const [examples, setExamples] = useState<string[]>([]);
@@ -78,36 +80,80 @@ export const MatriculeConfigurator: React.FC<MatriculeConfiguratorProps> = ({
         generateExamples();
     }, [localConfig, onChange]);
 
-    const updateConfig = (key: keyof MatriculeConfig, newValue: any) => {
-        setLocalConfig(prev => ({
-            ...prev,
-            [key]: newValue,
-        }));
+    const updateConfig = <K extends keyof MatriculeConfig>(key: K, newValue: MatriculeConfig[K]) => {
+        setLocalConfig(prev => ({ ...prev, [key]: newValue }));
     };
 
-    const updatePlaceholder = (key: string, value: string) => {
+    /**
+ * Update a placeholder value, and optionally its type.
+ * - key: placeholder key (e.g. "faculty")
+ * - value: placeholder value
+ * - type: optional 'school' | 'faculty' | 'department'
+ */
+    const updatePlaceholder = (key: string, value: string, type?: PlaceholderType) => {
         setLocalConfig(prev => ({
             ...prev,
             placeholders: {
                 ...(prev.placeholders || {}),
                 [key]: value,
             },
+            placeholderTypes: type
+                ? {
+                    ...(prev.placeholderTypes || {}),
+                    [key]: type,
+                }
+                : (prev.placeholderTypes || {}),
         }));
     };
 
+    /**
+     * Add a new placeholder with an optional type.
+     * Uses newPlaceholderKey + newPlaceholderType from state.
+     */
     const addPlaceholder = () => {
-        if (newPlaceholderKey.trim()) {
-            updatePlaceholder(newPlaceholderKey.trim(), '');
-            setNewPlaceholderKey('');
-        }
+        const key = newPlaceholderKey.trim();
+        if (!key) return;
+
+        setLocalConfig(prev => ({
+            ...prev,
+            placeholders: {
+                ...(prev.placeholders || {}),
+                [key]: '',
+            },
+            placeholderTypes:
+                newPlaceholderType
+                    ? {
+                        ...(prev.placeholderTypes || {}),
+                        [key]: newPlaceholderType,
+                    }
+                    : (prev.placeholderTypes || {}),
+        }));
+
+        setNewPlaceholderKey('');
+        setNewPlaceholderType('');
     };
 
+    /**
+ * Remove a placeholder and its type metadata.
+ */
     const removePlaceholder = (key: string) => {
         setLocalConfig(prev => {
-            const newPlaceholders = { ...(prev.placeholders || {}) };
-            delete newPlaceholders[key];
-            return { ...prev, placeholders: newPlaceholders };
+            const placeholders = { ...(prev.placeholders || {}) };
+            const placeholderTypes = { ...(prev.placeholderTypes || {}) };
+            delete placeholders[key];
+            delete placeholderTypes[key];
+            return { ...prev, placeholders, placeholderTypes };
         });
+    };
+
+    const setPlaceholderType = (key: string, type: PlaceholderType) => {
+        setLocalConfig(prev => ({
+            ...prev,
+            placeholderTypes: {
+                ...(prev.placeholderTypes || {}),
+                [key]: type,
+            },
+        }));
     };
 
     const applyTemplate = (template: typeof templateSuggestions[0]) => {
@@ -226,8 +272,8 @@ export const MatriculeConfigurator: React.FC<MatriculeConfiguratorProps> = ({
                                     key={category}
                                     onClick={() => setSelectedCategory(category)}
                                     className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${selectedCategory === category
-                                            ? 'bg-blue-600 text-white'
-                                            : 'bg-white text-gray-600 hover:bg-gray-100'
+                                        ? 'bg-blue-600 text-white'
+                                        : 'bg-white text-gray-600 hover:bg-gray-100'
                                         }`}
                                 >
                                     {category}
@@ -382,36 +428,94 @@ export const MatriculeConfigurator: React.FC<MatriculeConfiguratorProps> = ({
                                     <Plus className="h-4 w-4" />
                                     Add Placeholder
                                 </button>
+                                {/* Add a select, to allow the user to link placeholder to [school, or faculty or department] */}
+                                <select
+                                    value={newPlaceholderType}
+                                    onChange={(e) => setNewPlaceholderType(e.target.value as PlaceholderType)}
+                                    disabled={!newPlaceholderKey.trim()}
+                                    className="ml-2 bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500"
+                                >
+                                    <option value="">Select type</option>
+                                    <option value="school">School</option>
+                                    <option value="faculty">Faculty</option>
+                                    <option value="department">Department</option>
+                                </select>
                             </div>
                         </div>
 
                         {/* Existing Placeholders */}
                         <div className="space-y-3 max-h-60 overflow-y-auto">
-                            {placeholderEntries.map(([key, value]) => (
-                                <div key={key} className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-colors">
-                                    <div className="flex-1 flex items-center gap-3">
-                                        <span className="text-sm font-mono text-blue-700 bg-blue-100 px-3 py-1 rounded-full">
-                                            {'{{' + key + '}}'}
-                                        </span>
-                                        <span className="text-gray-400 font-medium">=</span>
-                                        <input
-                                            type="text"
-                                            value={value}
-                                            onChange={(e) => updatePlaceholder(key, e.target.value)}
-                                            placeholder="Enter value"
-                                            className="flex-1 bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500"
-                                        />
-                                    </div>
-                                    <button
-                                        type="button"
-                                        onClick={() => removePlaceholder(key)}
-                                        className="text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full p-2 transition-colors"
-                                        title="Remove placeholder"
+                            {placeholderEntries.map(([key, value]) => {
+                                const type = localConfig.placeholderTypes?.[key] ?? '';
+                                return (
+                                    <div
+                                        key={key}
+                                        className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
                                     >
-                                        <X className="h-4 w-4" />
-                                    </button>
-                                </div>
-                            ))}
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-3">
+                                                {/* key chip */}
+                                                <span
+                                                    className="shrink-0 text-sm font-mono text-blue-700 bg-blue-100 px-3 py-1 rounded-full"
+                                                    title="Placeholder key"
+                                                >
+                                                    {'{{' + key + '}}'}
+                                                </span>
+
+                                                <span className="text-gray-400 font-medium">=</span>
+
+                                                {/* value input */}
+                                                <input
+                                                    type="text"
+                                                    value={value}
+                                                    onChange={(e) => updatePlaceholder(key, e.target.value)}
+                                                    placeholder="Enter value"
+                                                    className="flex-1 bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500"
+                                                />
+                                            </div>
+
+                                            {/* type selector */}
+                                            <div className="mt-3 flex items-center gap-2">
+                                                <label className="text-xs text-gray-500">Type:</label>
+                                                <select
+                                                    value={type}
+                                                    onChange={(e) => setPlaceholderType(key, e.target.value as 'school' | 'faculty' | 'department')}
+                                                    className="bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 text-sm outline-none focus:border-blue-500"
+                                                    aria-label={`Type for ${key}`}
+                                                >
+                                                    <option value="">Unspecified</option>
+                                                    <option value="school">School</option>
+                                                    <option value="faculty">Faculty</option>
+                                                    <option value="department">Department</option>
+                                                </select>
+
+                                                {/* optional type pill for quick glance */}
+                                                {type ? (
+                                                    <span
+                                                        className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700"
+                                                        title="Linked category"
+                                                    >
+                                                        {type.charAt(0).toUpperCase() + type.slice(1)}
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-xs text-gray-400">No category</span>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* remove */}
+                                        <button
+                                            type="button"
+                                            onClick={() => removePlaceholder(key)}
+                                            className="self-start text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full p-2 transition-colors"
+                                            title="Remove placeholder"
+                                            aria-label={`Remove ${key}`}
+                                        >
+                                            <X className="h-4 w-4" />
+                                        </button>
+                                    </div>
+                                );
+                            })}
 
                             {placeholderEntries.length === 0 && (
                                 <div className="text-center text-gray-500 text-sm py-8 bg-gray-50 rounded-lg">
@@ -421,6 +525,7 @@ export const MatriculeConfigurator: React.FC<MatriculeConfiguratorProps> = ({
                                 </div>
                             )}
                         </div>
+
 
                         {/* Advanced Options */}
                         {showAdvanced && (

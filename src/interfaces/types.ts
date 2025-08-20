@@ -9,6 +9,15 @@ export type RoleUser = {
   isPrimary?: boolean;
 };
 
+export type Me = {
+  email: string,
+  isPrimary: boolean,
+  commandRole: string,
+  createdAt: string,
+  updatedAt: string,
+  id: string
+}
+
 export interface RootState {
   auth: AuthState;
   umsCreation: UMSCreationState;
@@ -41,6 +50,21 @@ export interface SaveState {
   error: string | null;
   hasUnsavedChanges: boolean;
 }
+
+export interface Program {
+    _id?: string;
+    id?: string;
+    name: string;
+    programType: string;
+    description?: string;
+    duration: number;          // years
+    departmentId: string;      // ref
+    createdAt?: string;
+    updatedAt?: string;
+}
+
+export type CreateProgramDto = Omit<Program, '_id' | 'createdAt' | 'updatedAt'>;
+export type UpdateProgramDto = Partial<CreateProgramDto>;
 
 export interface Tab {
   id: string;
@@ -80,12 +104,6 @@ export type Role = {
   users: RoleUser[];
 };
 
-// A type to represent a matricule configuration for the form
-export type MatriculeConfig = {
-  format?: string;
-  placeholders?: Record<string, string>;
-  sequenceLength?: number;
-};
 
 // A type to represent a file that can either be a new upload or an existing URL
 export type FileWithUrl = File | string;
@@ -166,16 +184,6 @@ export interface UMS {
   id: string;
 }
 
-export interface Program {
-  _id?: string;
-  name: string;
-  description?: string;
-  duration: number;
-  startDate: string;
-  endDate: string;
-  departmentId: string;
-}
-
 export interface Student {
   id: string;
   matricule: string;
@@ -209,13 +217,20 @@ export interface Student {
   updatedAt?: string;
 }
 
+export type PlaceholderType = 'school' | 'faculty' | 'department';
 
+export interface MatriculeConfig {
+  format?: string;
+  placeholders?: Record<string, string>;
+  placeholderTypes?: Record<string, PlaceholderType>; // NEW
+  sequenceLength?: number;
+}
 
 export type CreateStudentDto = {
   fullName: string;
   email?: string;
   phone: string;
-  level: string; 
+  level: string;
   gender: gender;
   program: string;
   guardian: string;
@@ -224,7 +239,7 @@ export type CreateStudentDto = {
   customFields?: Record<string, unknown>;
 };
 
-type gender = 'male'|'female'|'prefer not to say';
+type gender = 'male' | 'female' | 'prefer not to say';
 
 export const GENDER_ENUM = {
   MALE: 'male' as gender,

@@ -64,8 +64,8 @@ export class UMSService {
     private static readonly BASE_URL = '/ums';
 
     static async getIntro(): Promise<UMSIntro> {
-        const res = await api.get<UMSIntro>('/ums/intro');
-        return res.data;
+        const res = await api.get<ApiResponse<UMSIntro>>('/ums/intro');
+        return res.data.data;
     }
 
     // ---------- Modules ----------

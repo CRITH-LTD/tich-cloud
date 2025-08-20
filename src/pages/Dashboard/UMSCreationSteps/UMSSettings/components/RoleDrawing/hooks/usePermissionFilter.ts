@@ -6,6 +6,7 @@ export const usePermissionFilter = (allPermissions: PermissionsRoles[]) => {
   const [selectedPermissionCategory, setSelectedPermissionCategory] = useState<string>("all");
 
   const getPermissionCategory = (permissionName: string): string => {
+    if(!permissionName) return "Default"
     const parts = permissionName.split('_');
     return parts.length > 1 ? parts[0].toLowerCase() : 'general';
   };
@@ -15,6 +16,7 @@ export const usePermissionFilter = (allPermissions: PermissionsRoles[]) => {
   }, [allPermissions]);
 
   const filteredPermissions = useMemo(() => {
+    console.log(allPermissions)
     return allPermissions.filter(perm => {
       const matchesSearch = perm.name.toLowerCase().includes(permissionSearch.toLowerCase()) ||
         perm.description?.toLowerCase().includes(permissionSearch.toLowerCase());

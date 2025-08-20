@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import api from "../../config/axios";
 import { logout, setCredentials, setUser } from "../../features/auth/authSlice";
 import { pathnames } from "../../routes/path-names";
+import { ApiResponse } from "../../types/department.types";
 
 export type AuthIntent = "signup" | "signin";
 
@@ -101,19 +102,19 @@ export const useAuthForm = ({ intent }: UseAuthFormProps) => {
             }
 
             const endpoint = intent === "signup" ? "/auth/root/create" : "/auth/root/login";
-            const res = await api.post(endpoint, payload);
+            const res = await api.post<ApiResponse<any>>(endpoint, payload);
 
-            if (res.status === 200 || res.status === 201) {
-                const token = res.data.access_token;
+            if (res.status === 200 || res.status === 201 || res.data.success) {
+                const token = res.data.data.access_token;
                 dispatch(setCredentials({ accessToken: token }));
 
                 try {
-                    const meRes = await api.get("/users/me", {
+                    const meRes = await api.get<ApiResponse<any>>("/users/me", {
                         headers: { Authorization: `Bearer ${token}` },
                     });
 
-                    if (meRes?.data) {
-                        dispatch(setUser(meRes.data));
+                    if (meRes?.data.data) {
+                        dispatch(setUser(meRes.data.data));
                     }
                 } catch (meErr) {
                     console.error("Failed to fetch user:", meErr);

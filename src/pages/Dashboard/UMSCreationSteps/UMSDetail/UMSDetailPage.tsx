@@ -33,7 +33,7 @@ const UMSDetailPage: React.FC = () => {
         loading,
         error: deptError,
         refreshDepartments
-    } = useDepartments();
+    } = useDepartments({mode: 'all'});
     const [openRole, setOpenRole] = useState<number | null>(null);
     const [openDept, setOpenDept] = useState<number | null>(null);
 

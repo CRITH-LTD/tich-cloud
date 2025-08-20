@@ -7,6 +7,8 @@ import { setCredentials, setUser } from './features/auth/authSlice';
 import api from './config/axios';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { ApiResponse } from './types/department.types';
+import { Me } from './interfaces/types';
 
 const AuthBootstrap = () => {
   const dispatch = useDispatch();
@@ -18,14 +20,14 @@ const AuthBootstrap = () => {
 
     const fetchUser = async () => {
       try {
-        const res = await api.get('/users/me', {
+        const res = await api.get<ApiResponse<Me>>('/users/me', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
 
         dispatch(setCredentials({ accessToken: token }));
-        dispatch(setUser(res.data));
+        dispatch(setUser(res.data.data));
       } catch (err) {
         console.error('Session restore failed:', err);
         localStorage.removeItem('access_token'); // Clear invalid token

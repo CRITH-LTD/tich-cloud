@@ -452,7 +452,7 @@ export const templateSuggestions: MatriculeConfig[] = [
   {
     name: 'University of Yaoundé I',
     category: 'Universities',
-    format: '{{YY}}{{series}}{{sequence}}',
+    format: '{{year}}{{series}}{{sequence}}',
     placeholders: { YY: '19', series: 'K', sequence: '2776' },
     sequenceLength: 4,
     description: 'Example: 19K2776 (Faculty of Science, 2019)',
@@ -461,7 +461,7 @@ export const templateSuggestions: MatriculeConfig[] = [
   {
     name: 'University of Douala',
     category: 'Universities',
-    format: '{{YY}}{{deptLetter}}{{sequence}}',
+    format: '{{year}}{{deptLetter}}{{sequence}}',
     placeholders: { YY: '22', deptLetter: 'I', sequence: '01174' },
     sequenceLength: 5,
     description: 'Example: 22I01174 (IUT student, 2022)',
@@ -470,7 +470,7 @@ export const templateSuggestions: MatriculeConfig[] = [
   {
     name: 'University of Dschang',
     category: 'Universities',
-    format: 'UDS-{{YY}}{{facCode}}{{sequence}}',
+    format: 'UDS-{{year}}{{facCode}}{{sequence}}',
     placeholders: { YY: '24', facCode: 'AGR', sequence: '1234' },
     sequenceLength: 4,
     description: 'Example: UDS-24AGR1234 (Agronomy, 2024)',
@@ -479,7 +479,7 @@ export const templateSuggestions: MatriculeConfig[] = [
   {
     name: 'University of Buea',
     category: 'Universities',
-    format: '{{facCode}}{{YY}}{{series}}{{sequence}}',
+    format: '{{facCode}}{{year}}{{series}}{{sequence}}',
     placeholders: { facCode: 'SC', YY: '20', series: 'B', sequence: '764' },
     sequenceLength: 3,
     description: 'Example: SC20B764 (Faculty of Science, 2020)',
@@ -488,7 +488,7 @@ export const templateSuggestions: MatriculeConfig[] = [
   {
     name: 'University of Bamenda',
     category: 'Universities',
-    format: '{{SchoolCode}}{{YY}}{{ProgramCode}}{{sequence}}',
+    format: '{{SchoolCode}}{{year}}{{ProgramCode}}{{sequence}}',
     placeholders: { SchoolCode: 'HTTTC', YY: '24', ProgramCode: 'TED', sequence: '056' },
     sequenceLength: 3,
     description: 'Example: HTTTC24TED056 (UBa, TED program)',
@@ -508,7 +508,7 @@ export const templateSuggestions: MatriculeConfig[] = [
   {
     name: 'IRIC (Institut des Relations Internationales du Cameroun)',
     category: 'Grandes Écoles',
-    format: 'IRIC{{YY}}{{Section}}{{sequence}}',
+    format: 'IRIC{{year}}{{Section}}{{sequence}}',
     placeholders: { YY: '24', Section: 'DIP', sequence: '001' },
     sequenceLength: 3,
     description: 'Example: IRIC24DIP001 (Diplomacy, 2024)',
@@ -517,7 +517,7 @@ export const templateSuggestions: MatriculeConfig[] = [
   {
     name: 'ESSEC (École Supérieure des Sciences Économiques et Commerciales)',
     category: 'Grandes Écoles',
-    format: 'ESSEC/{{Campus}}/{{Program}}/{{YY}}/{{sequence}}',
+    format: 'ESSEC/{{Campus}}/{{Program}}/{{year}}/{{sequence}}',
     placeholders: { Campus: 'YDE', Program: 'GF', YY: '24', sequence: '0001' },
     sequenceLength: 4,
     description: 'Example: ESSEC/YDE/GF/24/0001',
@@ -528,7 +528,7 @@ export const templateSuggestions: MatriculeConfig[] = [
   {
     name: 'IUT (Institut Universitaire de Technologie)',
     category: 'Technical Schools',
-    format: 'IUT{{City}}/{{Dept}}/{{YY}}/{{sequence}}',
+    format: 'IUT{{City}}/{{Dept}}/{{year}}/{{sequence}}',
     placeholders: { City: 'DLA', Dept: 'GEA', YY: '24', sequence: '0001' },
     sequenceLength: 4,
     description: 'Example: IUTDLA/GEA/24/0001',
@@ -537,7 +537,7 @@ export const templateSuggestions: MatriculeConfig[] = [
   {
     name: 'ENSP (École Nationale Supérieure Polytechnique)',
     category: 'Technical Schools',
-    format: 'ENSP/{{Dept}}/{{Cycle}}/{{YY}}{{sequence}}',
+    format: 'ENSP/{{Dept}}/{{Cycle}}/{{year}}{{sequence}}',
     placeholders: { Dept: 'GIN', Cycle: 'ING', YY: '24', sequence: '023' },
     sequenceLength: 3,
     description: 'Example: ENSP/GIN/ING/24023',
@@ -548,7 +548,7 @@ export const templateSuggestions: MatriculeConfig[] = [
   {
     name: 'Lycée Général Leclerc',
     category: 'Secondary Schools',
-    format: 'LGL/{{Series}}/{{Class}}/{{YY}}/{{sequence}}',
+    format: 'LGL/{{Series}}/{{Class}}/{{year}}/{{sequence}}',
     placeholders: { Series: 'C', Class: 'TLE', YY: '24', sequence: '001' },
     sequenceLength: 3,
     description: 'Example: LGL/C/TLE/24/001',
@@ -557,7 +557,7 @@ export const templateSuggestions: MatriculeConfig[] = [
   {
     name: 'Collège de la Retraite',
     category: 'Secondary Schools',
-    format: 'CDR{{YY}}{{Class}}{{sequence}}',
+    format: 'CDR{{year}}{{Class}}{{sequence}}',
     placeholders: { YY: '24', Class: '6EME', sequence: '01' },
     sequenceLength: 2,
     description: 'Example: CDR246EME01',
@@ -577,7 +577,7 @@ export const templateSuggestions: MatriculeConfig[] = [
   {
     name: 'UCAC (Université Catholique d’Afrique Centrale)',
     category: 'Private Institutions',
-    format: 'UCAC/{{Faculty}}/{{YY}}/{{sequence}}',
+    format: 'UCAC/{{Faculty}}/{{year}}/{{sequence}}',
     placeholders: { Faculty: 'FGSE', YY: '24', sequence: '00001' },
     sequenceLength: 5,
     description: 'Example: UCAC/FGSE/24/00001',
@@ -586,7 +586,7 @@ export const templateSuggestions: MatriculeConfig[] = [
   {
     name: 'HIMS Buea (Higher Institute of Management Studies)',
     category: 'Private Institutions',
-    format: 'HIMS/{{Program}}/{{YY}}/{{sequence}}',
+    format: 'HIMS/{{Program}}/{{year}}/{{sequence}}',
     placeholders: { Program: 'BTECH', YY: '24', sequence: '0001' },
     sequenceLength: 4,
     description: 'Example: HIMS/BTECH/24/0001',
@@ -595,7 +595,7 @@ export const templateSuggestions: MatriculeConfig[] = [
   {
     name: 'HIBMAT Buea (Higher Institute of Business Management and Technology)',
     category: 'Private Institutions',
-    format: 'HIBMAT/{{Dept}}/{{YY}}/{{sequence}}',
+    format: 'HIBMAT/{{Dept}}/{{year}}/{{sequence}}',
     placeholders: { Dept: 'ACC', YY: '24', sequence: '0001' },
     sequenceLength: 4,
     description: 'Example: HIBMAT/ACC/24/0001',
@@ -609,9 +609,17 @@ export const TABS: Tab[] = [
   { id: 'security', label: 'Security', icon: Shield },
   { id: 'matricule', label: 'Matricule Configuration', icon: GraduationCap },
   { id: 'roles', label: 'Roles & Permissions', icon: Key },
+  { id: 'academicUnits', label: 'Academic Units', icon: BookOpen },
   { id: 'departments', label: 'Departments', icon: School2Icon },
   { id: 'programs', label: 'Programs', icon: BookOpen },
   { id: 'students', label: 'Students', icon: Users },
   { id: 'modules', label: 'Modules & Platforms', icon: Database },
   { id: 'danger', label: 'Danger Zone', icon: AlertTriangle }
+];
+export const BASE_PROGRAM_TYPES = [
+    { key: 'Undergraduate', label: 'Undergraduate' },
+    { key: 'Postgraduate', label: 'Postgraduate' },
+    { key: 'Diploma', label: 'Diploma' },
+    { key: 'Certificate', label: 'Certificate' },
+    { key: 'ShortCourse', label: 'Short Course' },
 ];

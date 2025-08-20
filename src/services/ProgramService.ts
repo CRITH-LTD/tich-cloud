@@ -1,21 +1,7 @@
 // services/ProgramService.ts
 import api from '../config/axios';
+import { CreateProgramDto, Program, UpdateProgramDto } from '../interfaces/types';
 import type { ApiResponse } from '../types/department.types'; // reuse shape
-
-export interface Program {
-    _id?: string;
-    name: string;
-    description?: string;
-    duration: number;          // years
-    startDate: string;         // ISO "YYYY-MM-DD"
-    endDate: string;           // ISO "YYYY-MM-DD"
-    departmentId: string;
-    createdAt?: string;
-    updatedAt?: string;
-}
-
-export type CreateProgramDto = Omit<Program, '_id' | 'createdAt' | 'updatedAt'>;
-export type UpdateProgramDto = Partial<CreateProgramDto>;
 
 const unwrap = <T>(payload: ApiResponse<T> | T): T => {
     const isApiResponse = (value: ApiResponse<T> | T): value is ApiResponse<T> => {
@@ -45,8 +31,8 @@ export class ProgramService {
 
     static async getPrograms(): Promise<Program[]> {
         try {
-            const res = await api.get<ApiResponse<Program[]> | Program[]>(this.BASE_URL);
-            const data = unwrap(res.data);
+            const res = await api.get<ApiResponse<Program[]>>(this.BASE_URL);
+            const data = unwrap(res.data.data);
             return Array.isArray(data) ? data : [];
         } catch (error) {
             console.error('Error fetching programs:', error);

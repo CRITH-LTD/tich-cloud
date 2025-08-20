@@ -18,7 +18,7 @@ const DrawerPortal: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     typeof document === 'undefined' ? null : createPortal(children, document.body);
 
 const orderGroups = (g: PermissionGroups) => {
-    const pref = ['user', 'ums', 'department', 'program', 'course', 'student', 'finance', 'system'];
+    const pref = ['user', 'ums', 'department', 'program', 'course', 'staff', 'student', 'finance', 'system'];
     return [...pref.filter(k => k in g), ...Object.keys(g).filter(k => !pref.includes(k)).sort()];
 };
 
@@ -93,6 +93,7 @@ const PermissionsDrawer: React.FC<{
     if (!open) return null;
 
     const totalSelected = selected.size;
+    console.log('Total selected permissions:', selected);
 
     return (
         <DrawerPortal>
@@ -118,6 +119,23 @@ const PermissionsDrawer: React.FC<{
                                 Selected: {totalSelected}
                             </span>
                         </div>
+                        {/* Badges, listing the permission names in max 2 rows with horizontal scroll */}
+                        <div className="flex flex-wrap gap-2 mt-2 max-h-14 overflow-x-auto overflow-y-auto">
+                            {Array.from(selected).map((sel: any) => (
+                                <span
+                                    key={sel.id}
+                                    className="flex-shrink-0 px-3 py-1 bg-blue-500 text-white rounded-full text-sm"
+                                >
+                                    {sel.name}
+                                </span>
+                            ))}
+                        </div>
+                        {totalSelected > 0 && (
+                            <p className="text-xs text-gray-500 mt-1">
+                                Click on a permission to toggle selection. Use the search bar to filter permissions.
+                            </p>
+                        )}
+
 
                         {/* search + actions */}
                         <div className="mt-3 flex items-center gap-2">

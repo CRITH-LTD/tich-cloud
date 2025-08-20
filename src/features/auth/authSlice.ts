@@ -1,9 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import UserInterface from "../../interfaces/user.interface";
+import { Me } from "../../interfaces/types";
 
 export interface AuthState {
     accessToken: string | null;
-    user: UserInterface | null;
+    user: UserInterface | Me | null;
     isAuthenticated: boolean;
 }
 
@@ -29,7 +30,7 @@ export const authSlice = createSlice({
 
         setUser: (
             state,
-            action: PayloadAction<UserInterface>
+            action: PayloadAction<UserInterface | Me>
         ) => {
             state.user = action.payload;
         }

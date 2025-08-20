@@ -35,6 +35,8 @@ import UserInterface from "../../interfaces/user.interface";
 import { TABS } from "../../constants/constants";
 import { createFormPayload } from "../../utils";
 import { UMSIntro, UMSService } from "../../services/UMSService";
+import { PermissionService } from "../../services/PermissionService";
+import { ApiResponse } from "../../types/department.types";
 
 export const useUMSSettings = () => {
     const { id } = useParams<{ id: string }>();
@@ -415,10 +417,10 @@ export const usePermissions = () => {
     const getPermissions = async () => {
         try {
             setLoading(true);
-            const response = await api.get('/permissions/grouped');
+            const res = await PermissionService.listGrouped() as any;
 
             // Assuming the response.data matches the PermissionsData structure
-            setPermissions(response.data && Object.keys(response.data).length > 0 ? response.data as PermissionsData : null);
+            setPermissions(res && Object.keys(res).length > 0 ? res as PermissionsData : null);
             // console.log('Permissions loaded:', response.data);
             setError(null);
         } catch (err: unknown) {
@@ -610,7 +612,7 @@ export const useCreateUMS = () => {
             formData.append("platforms", JSON.stringify(form.platforms));
 
             // Submit to backend
-            const response = await api.post('ums', formData);
+            const response = await api.post<ApiResponse<any>>('ums', formData);
             //  = await fetch("/api/ums", {
             //     method: "POST",
             //     body: formData,
@@ -624,7 +626,7 @@ export const useCreateUMS = () => {
             // Toast proper feed back
             navigate("/dashboard/ums")
             toast.success("UMS submitted successfully");
-            return response.data;
+            return response.data.data;
         } catch (error) {
             // Toast proper feedback
             toast.error("UMS submission failed");

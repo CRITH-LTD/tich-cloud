@@ -377,13 +377,13 @@ const StepOne = () => {
             {/* Full Width Sections */}
             <div className="mt-6 space-y-6">
                 {/* Student ID Configuration */}
-                <div className="bg-white rounded-lg border border-gray-200 p-6">
+                {/* <div className="bg-white rounded-lg border border-gray-200 p-6">
                     <h2 className="text-lg font-semibold text-gray-800 mb-4">Student ID System</h2>
                     <MatriculeConfigurator
                         value={form.matriculeConfig || { format: '', placeholders: {}, sequenceLength: 4 }}
                         onChange={(newConfig) => updateField("matriculeConfig", newConfig)}
                     />
-                </div>
+                </div> */}
             </div>
         </div>
     );

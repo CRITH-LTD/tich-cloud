@@ -22,6 +22,7 @@ import { CreateStudentDto, Student } from '../../../../../interfaces/types';
 import { Program } from './ProgramSettings';
 import { useStudents } from './RoleDrawing/hooks/useStudents';
 import { fmtPhone } from '../../../../../utils';
+import RenderAcademicStep from './studentForms/RenderAcademicStep';
 
 interface StudentFormModalProps {
     isOpen: boolean;
@@ -252,157 +253,7 @@ const StudentFormModal: React.FC<StudentFormModalProps> = ({
         </div>
     );
 
-    const renderAcademicStep = () => (
-        <div className="space-y-8">
-            <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Academic Information</h3>
-                <p className="text-gray-600">Choose the program and academic level for this student</p>
-            </div>
 
-            <div className="grid gap-8">
-                <div>
-                    <label className="block text-sm font-semibold text-gray-800 mb-3">
-                        <BookOpen className="w-4 h-4 inline mr-1" />
-                        Program <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                        value={form.program}
-                        onChange={setFormField('program')}
-                        disabled={saving}
-                        className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all
-                            ${errors.program ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-blue-300 bg-white'}
-                        `}
-                    >
-                        <option value="">Choose a program...</option>
-                        {programs.map(p => (
-                            <option key={p._id} value={p._id}>
-                                {p.name}
-                            </option>
-                        ))}
-                    </select>
-                    {errors.program && (
-                        <div className="mt-2 flex items-center gap-2 text-red-600 text-sm">
-                            <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                            {errors.program}
-                        </div>
-                    )}
-                </div>
-
-                <div>
-                    <label className="block text-sm font-semibold text-gray-800 mb-3">
-                        <GraduationCap className="w-4 h-4 inline mr-1" />
-                        Academic Level <span className="text-red-500">*</span>
-                    </label>
-
-                    <div className="grid grid-cols-3 md:grid-cols-6 gap-3 mb-4">
-                        {[100, 200, 300, 400, 500, 600].map((level) => (
-                            <button
-                                key={level}
-                                type="button"
-                                onClick={() => {
-                                    setField('level', level.toString()); // Using your form hook's setField
-                                    // Clear error if exists (assuming your error handling works this way)
-                                }}
-                                className={`
-        p-2 rounded-xl border-2 font-medium text-sm transition-all duration-200
-        focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2
-        ${form.level === level.toString()
-                                        ? 'border-blue-600 bg-blue-600 text-white shadow-md'
-                                        : 'border-gray-200 bg-white text-gray-700 hover:border-blue-400 hover:bg-blue-50'
-                                    }
-        ${errors?.level ? 'border-red-500 hover:border-red-500' : ''
-                                    }
-      `}
-                                disabled={saving} // Disable during form submission
-                                aria-pressed={form.level === level.toString()}
-                            >
-                                Level {level}
-                                {form.level === level.toString() && (
-                                    <span className="sr-only">(selected)</span>
-                                )}
-                            </button>
-                        ))}
-                    </div>
-
-                    <div className="relative">
-                        <div className="flex items-center gap-2 mb-2">
-                            <div className="flex-1 border-t border-gray-300"></div>
-                            <span className="text-xs text-gray-500 px-2 bg-white">OR</span>
-                            <div className="flex-1 border-t border-gray-300"></div>
-                        </div>
-
-                        <input
-                            type="text"
-                            value={form.level || ''}
-                            onChange={(e) => {
-                                const value = e.target.value;
-                                setField('level', value); // Using your form hook's setField
-                            }}
-                            disabled={saving}
-                            placeholder="Enter custom level (e.g., 150, 250, Masters, PhD)"
-                            className={`
-                                    w-full px-4 py-3 border-2 rounded-xl 
-                                    focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-1
-                                    transition-all duration-200
-                                    ${errors?.level
-                                    ? 'border-red-500 bg-red-50 hover:border-red-500'
-                                    : 'border-gray-200 hover:border-blue-400 bg-white'
-                                }
-                                    ${saving ? 'opacity-70 cursor-not-allowed' : ''}
-                        `}
-                            aria-invalid={errors?.level ? "true" : "false"}
-                            aria-describedby={errors?.level ? "level-error" : undefined}
-                        />
-                        <div className="absolute right-3 top-3 text-gray-400">
-                            <Info className="w-4 h-4" />
-                        </div>
-                    </div>
-
-                    {errors.level && (
-                        <div className="mt-2 flex items-center gap-2 text-red-600 text-sm">
-                            <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                            {errors.level}
-                        </div>
-                    )}
-
-                    <p className="mt-2 text-xs text-gray-500">
-                        Select a standard level above or enter a custom level in the field
-                    </p>
-                </div>
-
-                {form.program && form.level && (
-                    <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl p-6">
-                        <h4 className="font-semibold text-emerald-900 mb-3 flex items-center gap-2">
-                            <GraduationCap className="w-5 h-5" />
-                            Academic Summary
-                        </h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="flex items-center gap-3">
-                                <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
-                                    <BookOpen className="w-6 h-6 text-emerald-600" />
-                                </div>
-                                <div>
-                                    <p className="text-sm text-emerald-600 font-medium">Program</p>
-                                    <p className="font-semibold text-emerald-900">{getProgramName(form.program)}</p>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <div className="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center">
-                                    <GraduationCap className="w-6 h-6 text-teal-600" />
-                                </div>
-                                <div>
-                                    <p className="text-sm text-teal-600 font-medium">Level</p>
-                                    <p className="font-semibold text-teal-900">
-                                        {isNaN(Number(form.level)) ? form.level : `Level ${form.level}`}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-            </div>
-        </div>
-    );
 
     const renderGuardianStep = () => (
         <div className="space-y-6">
@@ -584,7 +435,12 @@ const StudentFormModal: React.FC<StudentFormModalProps> = ({
             case 1:
                 return renderPersonalInfoStep();
             case 2:
-                return renderAcademicStep();
+                return <RenderAcademicStep form={form}
+                    setField={setField}
+                    getProgramName={getProgramName}
+                    errors={errors}
+                    saving={saving}
+                    programs={programs} />;
             case 3:
                 return renderGuardianStep();
             case 4:

@@ -9,15 +9,15 @@ interface MatriculeConfig {
 }
 
 interface useMatriculeProps {
-    onInputChange:<K extends keyof UMSForm>(field: K, value: UMSForm[K]) => void;
+    onInputChange: <K extends keyof UMSForm>(field: K, value: UMSForm[K]) => void;
 }
 
-export const useMatricule = ({onInputChange}: useMatriculeProps) => {
+export const useMatricule = ({ onInputChange }: useMatriculeProps) => {
     const {
-            intro,
-            introLoading,
-            error,
-        } = useUMSManagement();
+        intro,
+        introLoading,
+        error,
+    } = useUMSManagement();
     // kk here, I shall elicit matricule config from UMS data
     const matriculeConfig = intro?.matriculeConfig || {
         format: '',
@@ -26,6 +26,7 @@ export const useMatricule = ({onInputChange}: useMatriculeProps) => {
     };
 
     const handleConfigChange = (config: MatriculeConfig) => {
+        console.log('config', config)
         onInputChange('matriculeConfig', config);
     };
 

@@ -1,4 +1,4 @@
-import { UMSForm } from "../interfaces/types";
+import { CreateStudentDto, UMSForm } from "../interfaces/types";
 
 /**
  * Creates a URL for an image, either from a File object or a string URL.
@@ -27,7 +27,27 @@ export const convertUrlToFile = async (url: string, fileName: string): Promise<F
     throw error;
   }
 };
+export function isCreateStudentDto(obj: any): obj is CreateStudentDto {
+  return (
+    obj &&
+    typeof obj === 'object' &&
+    typeof obj.fullName === 'string' &&
+    typeof obj.phone === 'string' &&
+    typeof obj.level === 'string' &&
+    typeof obj.gender === 'string' && 
+    typeof obj.program === 'string' &&
+    typeof obj.guardian === 'string' &&
+    typeof obj.guardianPhone === 'string' &&
+    typeof obj.guardianAddress === 'string' &&
+    (obj.email === undefined || typeof obj.email === 'string') &&
+    (obj.customFields === undefined || 
+     (typeof obj.customFields === 'object' && obj.customFields !== null))
+  );
+}
 
+// Usage:
+// if (isCreateStudentDto(dto)) return;
+// await onAddStudent(dto);
 export const createFormPayload = async (currentData: UMSForm, originalData: any): Promise<FormData | null> => {
   const payload = new FormData();
   let hasChanges = false;

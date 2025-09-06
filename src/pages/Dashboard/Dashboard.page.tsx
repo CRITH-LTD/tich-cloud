@@ -189,7 +189,7 @@ const DashboardPage = () => {
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-                        <p className="text-gray-600 mt-1">Welcome to TICH Education Cloud Console</p>
+                        <p className="text-gray-600 mt-1">Welcome to CRITH Education Cloud Console</p>
                     </div>
                     <div className="flex items-center space-x-3">
                         <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -557,7 +557,7 @@ const DashboardPage = () => {
                                 <div className="flex items-center">
                                     <Zap className="h-5 w-5 text-gray-400 mr-3" />
                                     <h2 className="text-lg font-semibold text-gray-900">
-                                        {hasUMS && !introLoading ? 'Enhance Your UMS' : 'Explore TICH'}
+                                        {hasUMS && !introLoading ? 'Enhance Your UMS' : 'Explore CRITH'}
                                     </h2>
                                 </div>
                                 {introLoading ? (

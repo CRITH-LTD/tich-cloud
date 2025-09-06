@@ -58,7 +58,7 @@ const TrustCompliance = () => {
             Trust & Compliance First
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Security and privacy are not afterthoughts. TICH is built from the ground up 
+            Security and privacy are not afterthoughts. CRITH is built from the ground up 
             with enterprise-grade security and compliance for educational institutions.
           </p>
         </div>
@@ -90,7 +90,7 @@ const TrustCompliance = () => {
               Certifications & Standards
             </h3>
             <p className="text-gray-600">
-              TICH meets the highest industry standards for security and compliance
+              CRITH meets the highest industry standards for security and compliance
             </p>
           </div>
           

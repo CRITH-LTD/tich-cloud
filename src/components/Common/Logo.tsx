@@ -1,6 +1,6 @@
-import { Cloud } from "lucide-react";
 import { Link } from "react-router-dom";
 import React from "react";
+import logo_crith from "../../assets/images/logo_cr_white.png";
 
 type LogoProps = {
   theme?: "light" | "dark";
@@ -22,13 +22,18 @@ export const Logo: React.FC<LogoProps> = ({ theme = "light", size = "md", classN
       to="/"
       className={`flex items-center space-x-2 font-semibold ${className}`}
       aria-label="Go to homepage"
+      
     >
-      <Cloud
-        className={`h-6 w-6 ${isDark ? "text-blue-600" : "text-blue-50"}`}
+      <div className="bg-blue-500 p-1 rounded-full">
+      <img
+        src={logo_crith}
+        alt="CRITH Logo"
+        className={`h-6 w-6  rounded-full object-left-bottom`}
         aria-hidden="true"
       />
+      </div>
       <span className={`${sizeClasses[size]} font-bold ${isDark ? "text-gray-900" : "text-white"}`}>
-        TICH
+        CRITH
       </span>
       <span className={`text-sm font-medium ${isDark ? "text-gray-400" : "text-gray-500"}`}>
         Education Cloud

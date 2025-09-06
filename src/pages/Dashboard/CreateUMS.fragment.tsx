@@ -25,7 +25,7 @@ const steps = [
     },
     {
         title: "Review & Launch",
-        description: "Review all your configurations and launch your UMS on TICH Education Cloud."
+        description: "Review all your configurations and launch your UMS on CRITH Education Cloud."
     }
 ];
 

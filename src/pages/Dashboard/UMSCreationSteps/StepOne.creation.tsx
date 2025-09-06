@@ -116,7 +116,7 @@ const StepOne = () => {
                                 placeholder="e.g. Gracefield University"
                             />
                             <p className="text-xs text-gray-500 mt-2">
-                                Primary identifier across TICH Cloud platform.
+                                Primary identifier across CRITH Cloud platform.
                             </p>
                         </div>
 

@@ -1,9 +1,9 @@
-import { ArrowRight, Play, GraduationCap, ShieldCheck, Sparkles, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, Play, ShieldCheck, Sparkles, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom'; // fix: react-router-dom
 import useDashboardLayout from '../pages/Dashboard/dashboard.hooks';
 
 const avatarArr = [
-  'https://media.licdn.com/dms/image/v2/D4E03AQHAqvE3kUnguw/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1687604503547?e=2147483647&v=beta&t=uxdGOWFmaTaWlbEjtZDkJRnxNpkYqhChnN7EAamsQzg',
+  'https://lh3.googleusercontent.com/a/ACg8ocLSaDMGf-Uab-xuiFaubCo-LFR9Wg7rJRFj7beQW_JkgMtKN5nW=s288-c-no',
   'https://avatars.githubusercontent.com/u/78331614?v=4',
   'https://media.licdn.com/dms/image/v2/D4E22AQE5eXu2ZV5zUA/feedshare-shrink_800/B4EZcg9mkiHcAg-/0/1748604715803?e=2147483647&v=beta&t=6LOu22oG6uWr8JtTtSiXdQJltgF2tJhbB62SZ2vRmt8',
   'https://media.licdn.com/dms/image/v2/C4D22AQEuK80NP7_RTg/feedshare-shrink_2048_1536/feedshare-shrink_2048_1536/0/1597896267452?e=2147483647&v=beta&t=6VRdqD6Jtn2xKudA97FA-HMfLugmbgmxoBH2nZfbHf4'
@@ -35,10 +35,10 @@ const Hero = () => {
       <div className="relative mx-auto max-w-[100rem] px-4 sm:px-6 lg:px-8 pt-24 pb-16">
         {/* Announcement pill */}
         <div className="mx-auto mb-8 flex w-fit items-center gap-2 rounded-full bg-blue-100/70 px-4 py-2 text-sm font-medium text-blue-800 backdrop-blur">
-          <GraduationCap className="h-4 w-4" />
+          {/* <GraduationCap className="h-4 w-4" />
           <span>Trusted by 50+ educational institutions</span>
           <span className="mx-1 text-blue-600">•</span>
-          <span className="text-blue-700">99.9% uptime</span>
+          <span className="text-blue-700">99.9% uptime</span> */}
         </div>
 
         {/* Headline */}
@@ -49,12 +49,12 @@ const Hero = () => {
               beautifully, at scale
             </span>
             <span className="mt-2 block text-4xl font-bold text-gray-700 md:text-5xl">
-              with TICH
+              with CRITH
             </span>
           </h1>
 
           <p className="mx-auto mt-6 max-w-3xl text-lg leading-relaxed text-gray-600 md:text-xl">
-            Launch a modern University Management System in minutes—not months. TICH is modular, cloud-native, and built for the real-world workflows of schools, colleges, and universities.
+            Launch a modern University Management System in minutes—not months. CRITH is modular, cloud-native, and built for the real-world workflows of schools, colleges, and universities.
           </p>
 
           {/* CTA Row */}
@@ -124,7 +124,7 @@ const Hero = () => {
         <div className="mx-auto mt-12 grid max-w-5xl grid-cols-2 gap-4 sm:grid-cols-4">
           {[
             { k: 'System Uptime', v: '99.9%' },
-            { k: 'Institutes Using TICH', v: '50+' },
+            { k: 'Institutes Using CRITH', v: '50+' },
             { k: 'Students Supported', v: '2M+' },
             { k: 'Regions', v: '2' },
           ].map((s, i) => (

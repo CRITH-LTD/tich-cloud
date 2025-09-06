@@ -35,7 +35,7 @@ const TargetAudience = () => {
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Whether you're managing a single campus or a nationwide education system, 
-            TICH provides the infrastructure you need to succeed
+            CRITH provides the infrastructure you need to succeed
           </p>
         </div>
         
@@ -71,7 +71,7 @@ const TargetAudience = () => {
         
         <div className="text-center mt-16">
           <p className="text-lg text-gray-600 mb-8">
-            Join institutions worldwide who trust TICH for their digital transformation
+            Join institutions worldwide who trust CRITH for their digital transformation
           </p>
           <button className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-4 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 transform hover:scale-105 font-semibold text-lg shadow-xl">
             Schedule a Consultation

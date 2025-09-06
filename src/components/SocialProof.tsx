@@ -12,19 +12,19 @@ const SocialProof = () => {
 
   const testimonials = [
     {
-      quote: "Tich reduced our authentication implementation time from weeks to hours. The developer experience is incredible.",
+      quote: "CRITH reduced our authentication implementation time from weeks to hours. The developer experience is incredible.",
       author: "Sarah Chen",
       role: "Lead Developer",
       company: "TechCorp"
     },
     {
-      quote: "Security is our top priority, and Tich gives us enterprise-grade protection without the complexity.",
+      quote: "Security is our top priority, and CRITH gives us enterprise-grade protection without the complexity.",
       author: "Michael Rodriguez",
       role: "CTO",
       company: "DataFlow"
     },
     {
-      quote: "The global performance and reliability of Tich's infrastructure is exactly what we needed for our users worldwide.",
+      quote: "The global performance and reliability of CRITH's infrastructure is exactly what we needed for our users worldwide.",
       author: "Emily Johnson",
       role: "Engineering Manager",
       company: "CloudSync"
@@ -39,7 +39,7 @@ const SocialProof = () => {
             Trusted by industry leaders
           </h2>
           <p className="text-xl text-gray-600">
-            Join thousands of companies building secure applications with Tich
+            Join thousands of companies building secure applications with CRITH
           </p>
         </div>
         

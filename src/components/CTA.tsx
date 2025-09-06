@@ -23,7 +23,7 @@ const CTA = () => {
             Ready to transform your institution?
           </h2>
           <p className="text-xl md:text-2xl text-blue-100 mb-12 max-w-3xl mx-auto">
-            Join hundreds of universities worldwide who trust TICH for their digital infrastructure
+            Join hundreds of universities worldwide who trust CRITH for their digital infrastructure
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12 max-w-4xl mx-auto">

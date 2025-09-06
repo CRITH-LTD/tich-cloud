@@ -33,7 +33,7 @@ const CloudConsole = () => {
                 <span className="text-white font-bold text-lg">T</span>
               </div>
               <div>
-                <h3 className="text-2xl font-bold text-gray-900">TICH Console</h3>
+                <h3 className="text-2xl font-bold text-gray-900">CRITH Console</h3>
                 <p className="text-gray-600">University of Technology - Main Campus</p>
               </div>
             </div>

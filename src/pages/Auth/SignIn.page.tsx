@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Cloud, Eye, EyeOff, ArrowLeft, Shield, Globe, Users } from 'lucide-react';
+import { Eye, EyeOff, ArrowLeft, Shield, Globe, Users } from 'lucide-react';
 import { useAuthForm } from './auth.hooks';
 import { Logo } from '../../components/Common/Logo';
 import LoadingSpinner from '../Dashboard/UMSCreationSteps/UMSSettings/components/LoadingSpinner';
+import logo_crith from "../../assets/images/logo_cr_white.png";
 
 const SignIn = () => {
   const {
@@ -26,14 +27,19 @@ const SignIn = () => {
         <div className="relative z-10 flex flex-col justify-center px-12 text-white">
           <div className="mb-8">
             <div className="flex items-center space-x-3 mb-6">
-              <Cloud className="h-12 w-12 text-white" />
+              <img
+                src={logo_crith}
+                alt="CRITH Logo"
+                className={`h-12 w-12 text-white rounded-full object-left-bottom`}
+                aria-hidden="true"
+              />
               <div>
-                <span className="text-3xl font-bold">TICH</span>
+                <span className="text-3xl font-bold">CRITH</span>
                 <div className="text-blue-200 text-sm font-medium">Education Cloud</div>
               </div>
             </div>
             <h1 className="text-4xl font-bold mb-4">
-              Welcome to TICH Console
+              Welcome to CRITH Console
             </h1>
             <p className="text-xl text-blue-100 mb-8">
               Manage your university's cloud infrastructure with enterprise-grade tools designed for education.
@@ -171,8 +177,8 @@ const SignIn = () => {
               type="submit"
               disabled={!formData.email || !formData.password || isSubmitting}
               className={`w-full ${!formData.email || !formData.password || isSubmitting
-                  ? "bg-blue-200 hover:bg-blue-100 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700"
+                ? "bg-blue-200 hover:bg-blue-100 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
                 } text-white py-3 px-4 rounded-lg focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 font-medium flex items-center justify-center gap-2`}
             >
               {isSubmitting ? (

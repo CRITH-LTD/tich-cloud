@@ -49,7 +49,7 @@ const Features = () => {
             Everything your university needs in the cloud
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            From simple course management to complex multi-campus operations, TICH scales with your institution
+            From simple course management to complex multi-campus operations, CRITH scales with your institution
           </p>
         </div>
         

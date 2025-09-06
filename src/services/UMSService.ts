@@ -198,4 +198,15 @@ export class UMSService {
             throw new Error('Failed to update UMS. Please try again.');
         }
     }
+
+    static async deleteUMS(umsId: string): Promise<void> {
+        try {
+            await api.delete(`/ums/${encodeURIComponent(umsId)}`);
+        } catch (error) {
+            console.error('Error updating UMS:', error);
+
+            throw new Error('Failed to delete UMS. Please try again.');
+        }
+    }
 }
+

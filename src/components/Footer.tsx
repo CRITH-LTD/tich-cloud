@@ -1,5 +1,5 @@
 import React from 'react';
-import { Cloud, Github, Twitter, Linkedin, Mail } from 'lucide-react';
+import { Github, Twitter, Linkedin, Mail } from 'lucide-react';
 import { Link } from 'react-router';
 import { Logo } from './Common/Logo';
 

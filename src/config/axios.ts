@@ -15,7 +15,7 @@ import { toast } from 'react-toastify';
 
 // Environment-based configuration
 const API_CONFIG = {
-  production: 'https://CRITH-sl9r.onrender.com',
+  production: 'https://tich-sl9r.onrender.com',
   development: 'http://localhost:8000',
   local: 'http://192.168.0.114:8000'
 } as const;
